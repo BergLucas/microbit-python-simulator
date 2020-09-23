@@ -1,5 +1,6 @@
 import time
 from .utils import rgb
+from .Options import *
 from .button.MCBButtonRenderer import MCBButtonRenderer
 from .display.MCBDisplayRenderer import MCBDisplayRenderer
 from .accelerometer.MCBAccelerometerRenderer import MCBAccelerometerRenderer
@@ -29,11 +30,11 @@ class MicrobitSimulator(Tk):
         buttons_size = width*0.15
         rely = (1-buttons_size/height)/2
         # Setup button a
-        button_a = MCBButtonRenderer(self.__background, buttons_size)
+        button_a = MCBButtonRenderer(self.__background, buttons_size, BUTTON_A)
         button_a.place(relx=0.05, rely=rely)
         self.__buttons['A'] = button_a
         # Setup button b
-        button_b = MCBButtonRenderer(self.__background, buttons_size)
+        button_b = MCBButtonRenderer(self.__background, buttons_size, BUTTON_B)
         button_b.place(relx=0.80, rely=rely)
         self.__buttons['B'] = button_b
         # Setup accelerometer

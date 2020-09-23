@@ -81,17 +81,18 @@ while True:
     if microbit.button_a.is_pressed():
         # send current direction
         if microbit.accelerometer.get_y() > 300:
-            direction = '0,1'
+            y = '1'
         elif microbit.accelerometer.get_y() < -300:
-            direction = '0,-1'
-        elif microbit.accelerometer.get_x() > 300:
-            direction = '1,0'
-        elif microbit.accelerometer.get_x() < -300:
-            direction = '-1,0'
+            y = '-1'
         else:
-            direction = '0,0'
-
-        radio.send(direction)
+            y = '0'
+        if microbit.accelerometer.get_x() > 300:
+            x = '1'
+        elif microbit.accelerometer.get_x() < -300:
+            x = '-1'
+        else:
+            x = '0'
+        radio.send(f'{x},{y}')
     elif microbit.button_b.is_pressed():
         # notify that the piece should be dropped
         radio.send('Drop')

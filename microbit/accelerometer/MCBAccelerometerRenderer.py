@@ -1,4 +1,5 @@
 from .MCBAccelerometer import MCBAccelerometer
+from .Options import *
 from tkinter import Frame, ttk, Scale, Label, Spinbox, Button, Grid, IntVar, StringVar
 from tkinter.font import Font
 
@@ -41,6 +42,10 @@ class MCBAccelerometerRenderer(ttk.Notebook, MCBAccelerometer):
         slider = Scale(sliderFrame, from_=2000, to=-2000, showvalue=False, width=width, variable=intValue)
         slider.bind('<Double-Button-1>', lambda e: intValue.set(0))
         slider.grid(row=2, column=0, sticky='ns')
+        if f'{name}_increase' in SLIDERS_BUTTONS and SLIDERS_BUTTONS[f'{name}_increase'] is not None:
+            self.bind_all(f'<KeyPress-{SLIDERS_BUTTONS[f"{name}_increase"]}>', lambda e: intValue.set(min(2000, intValue.get()+SLIDERS_SPEED)))
+        if f'{name}_decrease' in SLIDERS_BUTTONS and SLIDERS_BUTTONS[f'{name}_decrease'] is not None:
+            self.bind_all(f'<KeyPress-{SLIDERS_BUTTONS[f"{name}_decrease"]}>', lambda e: intValue.set(max(-2000, intValue.get()-SLIDERS_SPEED)))
         return sliderFrame
 
     def __add_gesturesFrame(self):
@@ -52,6 +57,9 @@ class MCBAccelerometerRenderer(ttk.Notebook, MCBAccelerometer):
         gesture_id = 0
         for gesture in MCBAccelerometer.GESTURES:
             self.__add_gesture(gesturesFrame, 10, 3, gesture_id//2, gesture_id%2, gesture, getCallback(gesture))
+            if gesture in GESTURES_BUTTONS and GESTURES_BUTTONS[gesture] is not None:
+                self.bind_all(f'<KeyPress-{GESTURES_BUTTONS[gesture]}>', lambda e: getCallback(gesture))
+                self.bind_all(f'<KeyRelease-{GESTURES_BUTTONS[gesture]}>', lambda e: self.stop_gesture())
             gesture_id += 1
         self.__add_gesture(gesturesFrame, 10, 3, gesture_id//2, gesture_id%2, 'Stop gesture', lambda: self.stop_gesture())
 

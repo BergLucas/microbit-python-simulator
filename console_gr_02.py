@@ -162,24 +162,27 @@ def move_piece(board, piece, direction):
     # take and split the directions from the parameter
     dx = int(direction[0])
     dy = int(direction[1])
-    new_piece = []
 
-    # moving the piece by adding the directions to the old coordinates of the piece
-    for coordinate in piece:
-        x = coordinate[0]
-        y = coordinate[1]
-        new_piece.append((x + dx, y + dy))
+    for (dx, dy) in ((dx, dy), (dx, 0), (0, dy)):
+        # moving the piece by adding the directions to the old coordinates of the piece
+        new_piece = []
+        for coordinate in piece:
+            x = coordinate[0]
+            y = coordinate[1]
+            new_piece.append((x + dx, y + dy))
 
-    # split the new coordinates and return them
-    for coordinate in new_piece:
-        new_x = coordinate[0]
-        new_y = coordinate[1]
+        # split the new coordinates and return them
+        for coordinate in new_piece:
+            new_x = coordinate[0]
+            new_y = coordinate[1]
 
-        if new_x > 4 or new_y > 4 or new_x < 0 or new_y < 0:
-            return piece
-        elif board[coordinate] != 0:
-            return piece
-    return new_piece
+            if new_x > 4 or new_y > 4 or new_x < 0 or new_y < 0:
+                break
+            elif board[coordinate] != 0:
+                break
+            else:
+                return new_piece
+    return piece
 
 
 def drop_piece(piece, board):

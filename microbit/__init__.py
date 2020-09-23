@@ -1,9 +1,8 @@
 from .display.Display import Display
 from .button.Button import Button
-from .MicrobitSimulatorThread import __MicrobitSimulatorThread
+from .MicrobitSimulatorThread import MicrobitSimulatorThread as __MicrobitSimulatorThread
 from .image.Image import Image
 from .accelerometer.Accelerometer import Accelerometer
-
 class _MicroBitDigitalPin:
     """Digital pin on the Micro:Bit board"""
 
@@ -172,19 +171,16 @@ __mcbsim_thread.start()
 __mcbsim = __mcbsim_thread.getMcbsim()
 
 # Create instances
-display = Display()
-display = __mcbsim.getDisplay()
+display: Display = __mcbsim.getDisplay()
 
-button_a = Button()
-button_a = __mcbsim.getButton('A')
-button_b = __mcbsim.getButton('B')
+button_a: Button = __mcbsim.getButton('A')
+button_b: Button = __mcbsim.getButton('B')
 
 spi = _spi()
 uart = _uart()
 i2c = _i2c()
 compass = _compass()
-accelerometer = Accelerometer()
-accelerometer = __mcbsim.getAccelerometer()
+accelerometer: Accelerometer = __mcbsim.getAccelerometer()
 
 # Microbit function
 

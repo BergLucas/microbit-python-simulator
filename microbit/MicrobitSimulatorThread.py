@@ -3,7 +3,7 @@ from _thread import interrupt_main
 from time import sleep
 from .MicrobitSimulator import MicrobitSimulator
 
-class __MicrobitSimulatorThread(Thread):
+class MicrobitSimulatorThread(Thread):
     def __init__(self):
         super().__init__(name='MicrobitSimulator')
         self.__mcbsim = None

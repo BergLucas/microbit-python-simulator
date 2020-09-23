@@ -1,5 +1,7 @@
-import radio, time
+import microbit, radio
 radio.on()
-radio.config(group='str')
-radio.send('lol')
-time.sleep(10)
+while True:
+    gesture = microbit.accelerometer.current_gesture()
+    if gesture != '':
+        print(gesture)
+    microbit.sleep(100)
