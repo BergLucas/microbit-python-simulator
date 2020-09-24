@@ -14,9 +14,10 @@ GESTURES_BUTTONS = {
 SLIDERS_BUTTONS = {
     'X_increase':'Right',
     'X_decrease':'Left',
-    'Y_increase':'Up',
-    'Y_decrease':'Down',
+    'Y_increase':'Down',
+    'Y_decrease':'Up',
     'Z_increase':'Shift_L',
     'Z_decrease':'Control_L'
 }
 SLIDERS_SPEED = 2000
+JOYSTICK_MODE = True
