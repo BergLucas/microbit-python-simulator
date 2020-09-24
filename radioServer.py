@@ -1,4 +1,3 @@
-import radio
-from time import sleep
-while True:
-    sleep(100)
+from synchronisation import SynchronisationServer
+SynchronisationServer(42000, True).start()
+input()

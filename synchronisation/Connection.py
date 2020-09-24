@@ -143,7 +143,7 @@ class Connection:
         -----------
         addr: The tuple ip, port (Tuple[str, int])
 
-        timeout: The timeout before the connection fail (float)
+        timeout: The timeout before the connection fail (optional - default: None) (float)
 
         Returns:
         --------
@@ -176,7 +176,7 @@ class Connection:
         -----------
         addr: The tuple ip, port (Tuple[str, int])
 
-        timeout: The timeout before the connection fail (float)
+        timeout: The timeout before the connection fail (optional - default: None) (float)
 
         Returns:
         --------
@@ -205,7 +205,7 @@ class Connection:
         -----------
         addr: The tuple ip, port (Tuple[str, int])
 
-        timeout: The timeout before the connection fail (float)
+        timeout: The timeout before the connection fail (optional - default: None) (float)
 
         Returns:
         --------

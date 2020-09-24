@@ -6,17 +6,120 @@ Some options are available in the Options.py file
 Documentation: https://microbit-micropython.readthedocs.io/fr/latest/radio.html
 """
 from .Radio import RATE_250KBIT, RATE_1MBIT, RATE_2MBIT
-from typing import Tuple
+from typing import Tuple, Union
 def __startRadio():
     """ Start a radio 
     
     Returns:
     --------
     radio : The radio (Radio)
+
+    Raises:
+    -------
+    TypeError if a parameter has an invalid type
     """
     from .Radio import Radio
-    from .Options import SYNCHRONISATION_ADDRESS, DATA_ADDRESS, BLUETOOTH_PORT, IP, TARGET_IPS, INTERVAL, TIMEOUT, DEBUG
-    return Radio(SYNCHRONISATION_ADDRESS, DATA_ADDRESS, BLUETOOTH_PORT, ip=IP, target_ips=TARGET_IPS, interval=INTERVAL, timeout=TIMEOUT, debug=DEBUG)
+    from .Options import SYNCHRONISATION_IP, SYNCHRONISATION_PORT, AUTO_START_SYNCHRONISATION_SERVER, BLUETOOTH_PORT, INTERVAL, TIMEOUT, DEBUG
+    from synchronisation import Connection, checkAddress, SynchronisationServer
+    # Check types
+    if not isinstance(AUTO_START_SYNCHRONISATION_SERVER, bool):
+        raise TypeError(f'invalid type : {type(AUTO_START_SYNCHRONISATION_SERVER)} is not bool')
+    if not isinstance(SYNCHRONISATION_PORT, int):
+        raise TypeError(f'invalid type : {type(SYNCHRONISATION_PORT)} is not int')
+    if not isinstance(TIMEOUT, (int, type(None))):
+        raise TypeError(f'invalid type : {type(TIMEOUT)} is not int')
+    # Find the SynchronisationServer
+    if SYNCHRONISATION_IP is None:
+        SYNCHRONISATION_IP = __find_sync_server(SYNCHRONISATION_PORT, TIMEOUT)
+        if SYNCHRONISATION_IP is None:
+            SYNCHRONISATION_IP = '127.0.0.1'
+    sync_address = (SYNCHRONISATION_IP, SYNCHRONISATION_PORT)
+    checkAddress(sync_address)
+    # Check if the server is on
+    if not Connection.isPortOpen(sync_address, TIMEOUT):
+        if AUTO_START_SYNCHRONISATION_SERVER:
+            SynchronisationServer(SYNCHRONISATION_PORT, DEBUG).start()
+            sync_address = ('127.0.0.1', SYNCHRONISATION_PORT)
+        else:
+            raise ConnectionError('Could not connect to the SynchronisationServer')
+    return Radio(sync_address, BLUETOOTH_PORT, interval=INTERVAL, timeout=TIMEOUT, debug=DEBUG)
+
+def __find_sync_server(port: int, timeout: int = None) -> Union[str, None]:
+    """ Find the ip of a synchronisation server 
+    
+    Parameters:
+    -----------
+    port : The port to check (int)
+
+    timeout : The timeout (optional - default: None) (int)
+
+    Returns:
+    --------
+    ip : The ip of the server if found, None otherwise (Union[str, None])
+
+    Raises:
+    -------
+    TypeError if a parameter has an invalid type
+    """
+    # Check types
+    if not isinstance(port, int):
+        raise TypeError(f'invalid type : {type(port)} is not int')
+    if not isinstance(timeout, (int, type(None))):
+        raise TypeError(f'invalid type : {type(timeout)} is not int')
+    # Init
+    import socket
+    from synchronisation import Connection
+    from threading import Thread, Lock
+    from queue import Queue
+    ips_queue = Queue()
+    ips_lock = Lock()
+    ip_list = []
+    ip_lock = Lock()
+    threads = []
+    # Get the ip
+    for ip in socket.gethostbyname_ex(socket.gethostname())[-1]:
+        ip_parts = ip.split('.')
+        if len(ip_parts) > 3:
+            for i in range(256):
+                ips_queue.put(f'{ip_parts[0]}.{ip_parts[1]}.{ip_parts[2]}.{i}')
+    # Create the ping function
+    def ping():
+        continue_ping = True
+        while continue_ping:
+            # Get the target ip
+            ip_lock.acquire()
+            ips_lock.acquire()
+            if not ips_queue.empty and len(ip) == 0:
+                target_ip = ips_queue.get()
+            else:
+                continue_ping = False
+                target_ip = None
+            ip_lock.release()
+            ips_lock.release()
+            # Check if target ip is a server
+            if target_ip is not None and Connection.isPortOpen((target_ip, port)):
+                ip_lock.acquire()
+                if len(ip) == 0:
+                    ip_list.append(target_ip)
+                ip_lock.release()
+                continue_ping = False
+    # Check the localhost
+    if Connection.isPortOpen(('127.0.0.1', port)):
+        ip_list.append('127.0.0.1')
+    else:
+        # Create the threads
+        for i in range(256):
+            t = Thread(target=ping, daemon=True)
+            t.start()
+            threads.append(t)
+        # Wait the threads
+        for t in threads:
+            t.join()
+    # Return the ip if there is one
+    if len(ip_list) == 0:
+        return None
+    else:
+        return ip_list[0]
 
 __radio = __startRadio()
 
