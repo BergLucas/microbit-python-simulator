@@ -158,7 +158,7 @@ class Connection:
         ValueError if a parameter have an invalid value 
         """
         checkAddress(addr)
-        if not isinstance(timeout, (float, type(None))):
+        if not isinstance(timeout, (float, int, type(None))):
             raise TypeError(f'invalid type : {type(timeout)} is not a float')
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -187,7 +187,7 @@ class Connection:
         ValueError if a parameter have an invalid value 
         """
         checkAddress(addr)
-        if not isinstance(timeout, (float, type(None))):
+        if not isinstance(timeout, (float, int, type(None))):
             raise TypeError(f'invalid type : {type(timeout)} is not a float')
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -216,7 +216,7 @@ class Connection:
         ValueError if a parameter have an invalid value 
         """
         checkAddress(addr)
-        if not isinstance(timeout, (float, type(None))):
+        if not isinstance(timeout, (float, int, type(None))):
             raise TypeError(f'invalid type : {type(timeout)} is not a float')
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)

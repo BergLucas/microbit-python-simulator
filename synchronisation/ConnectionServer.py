@@ -19,6 +19,8 @@ class ConnectionServer:
         
         Exception if the port is already in use
         """
+        if not isinstance(timeout, (float, int, type(None))):
+            raise TypeError(f'invalid type : {type(timeout)} is not a float')
         if not isinstance(port, int):
             raise TypeError(f'invalid type : {type(port)} is not int')
         if not isinstance(ip, str):

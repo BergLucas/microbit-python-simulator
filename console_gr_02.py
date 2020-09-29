@@ -180,8 +180,8 @@ def move_piece(board, piece, direction):
                 break
             elif board[coordinate] != 0:
                 break
-            else:
-                return new_piece
+        else:
+            return new_piece
     return piece
 
 

@@ -61,11 +61,13 @@ class MCBAccelerometerRenderer(ttk.Notebook, MCBAccelerometer):
         self.add(gesturesFrame, text='Gestures')
         def getCallback(gesture):
             return lambda: self.do_gesture(gesture)
+        def getCommand(gesture):
+            return lambda e: self.do_gesture(gesture)
         gesture_id = 0
         for gesture in MCBAccelerometer.GESTURES:
             self.__add_gesture(gesturesFrame, 10, 3, gesture_id//2, gesture_id%2, gesture, getCallback(gesture))
             if gesture in GESTURES_BUTTONS and GESTURES_BUTTONS[gesture] is not None:
-                self.bind_all(f'<KeyPress-{GESTURES_BUTTONS[gesture]}>', lambda e: getCallback(gesture))
+                self.bind_all(f'<KeyPress-{GESTURES_BUTTONS[gesture]}>', getCommand(gesture))
                 self.bind_all(f'<KeyRelease-{GESTURES_BUTTONS[gesture]}>', lambda e: self.stop_gesture())
             gesture_id += 1
         self.__add_gesture(gesturesFrame, 10, 3, gesture_id//2, gesture_id%2, 'Stop gesture', lambda: self.stop_gesture())

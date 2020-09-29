@@ -76,8 +76,11 @@ class Radio:
         while self.__on:
             self.__port = self.__bluetooth_port + count
             if not Connection.isPortOpen(('127.0.0.1', self.__port), self.__timeout):
-                self.__receive_server = ConnectionServer(self.__port, '', self.__timeout)
-                break
+                try:
+                    self.__receive_server = ConnectionServer(self.__port, '', self.__timeout)
+                    break
+                except:
+                    count += 1
             else:
                 count += 1
         self.__sync_client.connect(self.__synchronisation_address)
