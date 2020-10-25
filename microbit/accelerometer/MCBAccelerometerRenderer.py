@@ -1,6 +1,6 @@
 from .MCBAccelerometer import MCBAccelerometer
 from .Settings import *
-from tkinter import Frame, ttk, Scale, Label, Spinbox, Button, Grid, IntVar, StringVar, Widget
+from tkinter import Frame, ttk, Scale, Label, Spinbox, Button, Grid, IntVar, StringVar, Widget, Tk
 from tkinter.font import Font
 
 class MCBAccelerometerRenderer(ttk.Notebook, MCBAccelerometer):
@@ -21,7 +21,7 @@ class MCBAccelerometerRenderer(ttk.Notebook, MCBAccelerometer):
 
         ValueError if height <= 0 or width <= 0
         """
-        if not isinstance(master, Widget):
+        if not isinstance(master, (Widget, Tk)):
             raise TypeError(f'invalid type : {type(master)} is not a Widget')
         if not isinstance(width, int):
             raise TypeError(f'invalid type : {type(width)} is not a int')

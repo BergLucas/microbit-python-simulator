@@ -31,23 +31,23 @@ class MicrobitSimulator(Tk):
         x_space = 0.4
         size = width*x_space
         y_space = size/height
-        self.__display = MCBDisplayRenderer(self.__background, size)
+        self.__display = MCBDisplayRenderer(self.__background, int(size))
         self.__display.place(relx=(1-x_space)/2, rely=(1-y_space)/2)
         # Setup buttons
         self.__buttons = {}
         buttons_size = width*0.15
         rely = (1-buttons_size/height)/2
         # Setup button a
-        button_a = MCBButtonRenderer(self.__background, buttons_size, BUTTON_A)
+        button_a = MCBButtonRenderer(self.__background, int(buttons_size), BUTTON_A)
         button_a.place(relx=0.05, rely=rely)
         self.__buttons['A'] = button_a
         # Setup button b
-        button_b = MCBButtonRenderer(self.__background, buttons_size, BUTTON_B)
+        button_b = MCBButtonRenderer(self.__background, int(buttons_size), BUTTON_B)
         button_b.place(relx=0.80, rely=rely)
         self.__buttons['B'] = button_b
         # Setup accelerometer
         self.geometry(f'{900}x{height}')
-        self.__accelerometer = MCBAccelerometerRenderer(self, 200, height)
+        self.__accelerometer = MCBAccelerometerRenderer(self, 200, int(height))
         self.__accelerometer.place(x=700, y=0)
 
     def quit(self):

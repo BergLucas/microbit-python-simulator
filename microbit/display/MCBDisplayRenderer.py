@@ -34,7 +34,7 @@ class MCBDisplayRenderer(Frame, MCBDisplay):
         self.__leds = {}
         for lx in range(5):
             for ly in range(5):
-                led = Led(self, led_width*size, led_height*size)
+                led = Led(self, int(led_width*size), int(led_height*size))
                 led.place(relx=(space_width+led_width)*lx, rely=(space_height+led_height)*ly, relwidth=led_width, relheight=led_height)
                 self.__leds[(lx,ly)] = led
         # Create the abstract pixels

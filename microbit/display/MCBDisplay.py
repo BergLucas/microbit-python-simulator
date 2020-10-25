@@ -116,7 +116,8 @@ class MCBDisplay(Display):
         """
         # Check if value is an image
         if isinstance(value, Image):
-            value = [value]
+            self.__show_image(value)
+            return
         # Check if value is string or float or integer:
         elif isinstance(value, (str, int, float)):
             string = str(value)
@@ -309,7 +310,7 @@ class MCBDisplay(Display):
             for image in image_list:
                 if not self.__run:
                     break
-                self.show(image)
+                self.__show_image(image)
                 sleep(delay/1000)
             one_time = False
     
@@ -371,11 +372,22 @@ class MCBDisplay(Display):
             image = new_image
             width = image.width()
             while (width > 0) and self.__run:
-                self.show(image)
+                self.__show_image(image)
                 image = image.shift_left(1)
                 sleep(delay/1000)
                 width -= 1
             one_time = False
+
+    def __show_image(self, image: Image):
+        """ Show an image 
+        
+        Parameters:
+        -----------
+        image : The image to display (Image)
+        """
+        for x in range(5):
+            for y in range(5):
+                self.set_pixel(x, y, image.get_pixel(x, y))
 
     def __remove_void(self, image: Image) -> Image:
         """ Resize an image to remove the void around it
