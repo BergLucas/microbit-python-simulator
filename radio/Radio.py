@@ -1,8 +1,4 @@
-from .SynchronisationClient import SynchronisationClient
-from .SynchronisationServer import SynchronisationServer
-from .Connection import Connection
-from .ConnectionServer import ConnectionServer
-from .AddressesLinker import Address, AddressesLinker, checkAddress
+from synchronisation import *
 from typing import Dict, Tuple, Union, List
 from queue import Queue
 from threading import Thread, Lock
@@ -14,26 +10,20 @@ RATE_1MBIT = 1000
 RATE_2MBIT = 2000
 
 class Radio:
-    def __init__(self, synchronisation_address: Address, data_address: Address, bluetooth_port: int, *, ip: str = None, target_ips: List[str] = None, interval: float = 0, timeout: int = None, debug: bool = False):
+    def __init__(self, synchronisation_address: Address, bluetooth_port: int, *, interval: float = 0, timeout: int = None, debug: bool = False):
         """ Create a radio
         
         Parameters:
         -----------
         synchronisation_address: The address used for sync connection (Tuple[str, int])
 
-        data_address : The address used for data connection (Tuple[str, int])
-
         bluetooth_port : The port used which listen for incoming connection (int)
 
-        ip : The local ip of the server (optional - default: None) (str)
+        interval : The interval beetween each check (optional - default: 0) (float)
 
-        targets_ips : The ips which are going to be check for synchronisation (List[str])
+        timeout : The number of seconds before a connection timeout (optional - default: None) (int)
 
-        interval : The interval beetween each check (float)
-
-        timeout : The number of seconds before a connection timeout (int)
-
-        debug : Print debug info if True (bool)
+        debug : Print debug info if True (optional - default: False) (bool)
 
         Raises:
         -------
@@ -43,17 +33,8 @@ class Radio:
         """
         # Check types
         checkAddress(synchronisation_address)
-        checkAddress(data_address)
         if not isinstance(bluetooth_port, int):
             raise TypeError(f'invalid type : {type(bluetooth_port)} is not a int')
-        if not isinstance(ip, (str, type(None))):
-            raise TypeError(f'invalid type : {type(ip)} is not a str')
-        if not isinstance(target_ips, (list, type(None))):
-            raise TypeError(f'invalid type : {type(target_ips)} is not a list')
-        if target_ips is not None:
-            for target_ip in target_ips:
-                if not isinstance(target_ip, str):
-                    raise TypeError(f'invalid type : {type(target_ip)} is not a str')
         if not isinstance(interval, (int, float)):
             raise TypeError(f'invalid type : {type(interval)} is not a float')
         if not isinstance(timeout, (int, type(None))):
@@ -61,10 +42,7 @@ class Radio:
         if not isinstance(debug, bool):
             raise TypeError(f'invalid type : {type(debug)} is not a bool')
         self.__synchronisation_address = synchronisation_address
-        self.__data_address = data_address
         self.__bluetooth_port = bluetooth_port
-        self.__ip = ip
-        self.__target_ips = target_ips
         self.__interval = interval
         self.__timeout = timeout
         self.__debug = debug
@@ -73,9 +51,6 @@ class Radio:
             raise ValueError(f'invalid value : interval must be positive')
         self.__ips = socket.gethostbyname_ex(socket.gethostname())[-1] + ['localhost', '127.0.0.1']
         self.__sync_client = SynchronisationClient(self.__debug)
-        # Create and start a validation server if not already open
-        if not Connection.isPortOpen(self.__synchronisation_address):
-            SynchronisationServer(self.__synchronisation_address[1], self.__data_address[1], ip=self.__ip, target_ips=self.__target_ips, interval=self.__interval, debug=self.__debug).start()
         # Init the attributes
         self.__on = False
         self.__group = 'channel1group1'
@@ -98,14 +73,17 @@ class Radio:
         self.__start_time = time()
         # Getting a port
         count = 0
-        while True:
+        while self.__on:
             self.__port = self.__bluetooth_port + count
-            try:
-                self.__receive_server = ConnectionServer(self.__port, '', self.__timeout)
-                break
-            except:
+            if not Connection.isPortOpen(('127.0.0.1', self.__port), self.__timeout):
+                try:
+                    self.__receive_server = ConnectionServer(self.__port, '', self.__timeout)
+                    break
+                except:
+                    count += 1
+            else:
                 count += 1
-        self.__sync_client.connect(self.__data_address)
+        self.__sync_client.connect(self.__synchronisation_address)
         self.__sync_client.linkPort(self.__group, self.__port)
         Thread(target=self.__synchroniseAddresses, daemon=True).start()
         Thread(target=self.__acceptClientConnection, daemon=True).start()
@@ -382,16 +360,17 @@ class Radio:
         self.__connected_lock.release()
 
     def __synchroniseAddresses(self):
-        """ Synchronise the self.__ips with the SynchronisationServer until the connection is lost if the synchronisation doesn't already exists """
+        """ Synchronise with the SynchronisationServer until the connection is lost if the synchronisation doesn't already exists """
         if self.__debug:
             print('Radio : Try to Synchronise address with the SynchronisationServer')
         while self.__on:
             # Connect to the server if not connected
             if not self.__sync_client.connected:
                 try:
-                    self.__sync_client.connect(self.__data_address)
+                    self.__sync_client.connect(self.__synchronisation_address)
+                    self.__sync_client.linkPort(self.__group, self.__port)
                     if self.__debug:
-                        print(f'Radio : Connected to the SynchronisationServer at {self.__data_address}')
+                        print(f'Radio : Connected to the SynchronisationServer at {self.__synchronisation_address}')
                 except:
                     if self.__debug:
                         print('Radio : Could not connect to the SynchronisationServer')
@@ -423,4 +402,4 @@ class Radio:
                 else:
                     self.__sync_client.disconnect()
                     if self.__debug:
-                        print(f'Radio : Disconnected from the SynchronisationServer at {self.__data_address}')
+                        print(f'Radio : Disconnected from the SynchronisationServer at {self.__synchronisation_address}')

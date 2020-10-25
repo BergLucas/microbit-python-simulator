@@ -2,27 +2,32 @@ class Image:
     """Dummy image class for autocompletion"""
 
 class Image:
-    """ Base image class
-    Image() - Create a blank 5x5 image
+    def __init__(self, *args, width: int = None, height: int = None, buffer: bytearray = None):
+        """ Base image class
+        Image() - Create a blank 5x5 image
 
-    Image(string) - Create an image by parsing the string, a single character returns that glyph
+        Image(string) - Create an image by parsing the string, a single character returns that glyph
 
-    Image(width, height) - Create a blank image of given size
+        Image(width, height) - Create a blank image of given size
 
-    Image(width, height, buffer) - Create an image from the given buffer
+        Image(width, height, buffer) - Create an image from the given buffer
 
-    Parameters:
-    -----------
-    string : A string which represents the image or a single character (str)
+        Parameters:
+        -----------
+        string : A string which represents the image or a single character (str)
 
-    width : The width of the image (int) (optional)
+        width : The width of the image (int) (optional)
 
-    height : The height of the image (int) (optional)
+        height : The height of the image (int) (optional)
 
-    buffer : A bytearray which represents the image (bytearray) (optionnal)
+        buffer : A bytearray which represents the image (bytearray) (optionnal)
 
-    """
-    def __init__(self, *args, width=None, height=None, buffer=None):
+        Raises:
+        -------
+        TypeError if a parameters has an invalid type
+
+        IndexError if the size is invalid
+        """
         # Create empty image
         self.__pixels = {}
         self._readonly = False
@@ -73,17 +78,42 @@ class Image:
         else:
             raise IndexError('Image() takes 0 to 3 arguments')
 
-    def width(self):
-        """gets the number of columns in an image"""
+    def width(self) -> int:
+        """Gets the number of columns in an image
+        
+        Returns:
+        --------
+        width : The width of the image (int)"""
         return self.__width
 
-    def height(self):
-        """gets the number of rows in an image"""
+    def height(self) -> int:
+        """Gets the number of rows in an image
+                
+        Returns:
+        --------
+        height : The height of the image (int)
+        """
         return self.__height
 
-    def set_pixel(self, x, y, value):
-        """sets the brightness of a pixel at the given position
-        Cannot be used on inbuilt images."""
+    def set_pixel(self, x: int, y: int, value: int):
+        """Sets the brightness of a pixel at the given position. Cannot be used on inbuilt images.
+        
+        Parameters:
+        -----------
+        x : The x position (int)
+
+        y : The y position (int)
+        
+        value : The brightness (int)
+
+        Raises:
+        -------
+        TypeError if a parameter has an invalid type
+
+        ValueError if the x or y are outside the image
+        
+        ValueError if the brightness is not between 0 and 9
+        """
         if self._readonly:
             raise AttributeError('the image cannot be modified')
         if not self.__inImage(x, y):
@@ -94,64 +124,194 @@ class Image:
             raise ValueError('brightness out of bounds')
         self.__pixels[(x, y)] = value
 
-    def get_pixel(self, x, y):
-        """returns the brightness of the pixel located at x,y"""
+    def get_pixel(self, x: int, y: int) -> int:
+        """Returns the brightness of the pixel located at x,y
+        
+        Parameters:
+        -----------
+        x : The x position (int)
+
+        y : The y position (int)
+
+        Raises:
+        -------
+        TypeError if a parameter has an invalid type
+
+        Notes:
+        ------
+        Returns 0 if x or y is outside the image
+        """
         if not self.__inImage(x, y):
             return 0
         else:
             return int(self.__pixels[(x, y)])
 
-    def shift_left(self, n):
-        """returns a new image created by shifting the image left by n columns"""
+    def shift_left(self, n: int):
+        """Returns a new image created by shifting the image left by n columns
+        
+        Parameters:
+        -----------
+        n : The number of shifting (int)
+
+        Returns:
+        --------
+        image : The shifted image (Image)
+
+        Raises:
+        -------
+        TypeError if a parameter has an invalid type
+        """
+        if not isinstance(n, int):
+            raise TypeError(f'invalid type : {type(n)} is not a int')
         image = Image(width=self.__width, height=self.__height)
         image.blit(self, n, 0, self.__width, self.__height)
         return image
 
-    def shift_right(self, n):
-        """returns a new image created by shifting the image right by n columns"""
+    def shift_right(self, n: int):
+        """Returns a new image created by shifting the image right by n columns
+
+        Parameters:
+        -----------
+        n : The number of shifting (int)
+
+        Returns:
+        --------
+        image : The shifted image (Image)
+
+        Raises:
+        -------
+        TypeError if a parameter has an invalid type
+        """
         return self.shift_left(-n)
 
-    def shift_up(self, n):
-        """returns a new image created by shifting the image up by n rows"""
+    def shift_up(self, n: int):
+        """Returns a new image created by shifting the image up by n rows
+        
+        Parameters:
+        -----------
+        n : The number of shifting (int)
+
+        Returns:
+        --------
+        image : The shifted image (Image)
+
+        Raises:
+        -------
+        TypeError if a parameter has an invalid type
+        """
         image = Image(width=self.__width, height=self.__height)
         image.blit(self, 0, n, self.__width, self.__height)
         return image
 
-    def shift_down(self, n):
-        """returns a new image created by shifting the image down by n rows"""
+    def shift_down(self, n: int):
+        """Returns a new image created by shifting the image down by n rows
+        
+        Parameters:
+        -----------
+        n : The number of shifting (int)
+
+        Returns:
+        --------
+        image : The shifted image (Image)
+
+        Raises:
+        -------
+        TypeError if a parameter has an invalid type
+        """
         return self.shift_up(-n)
 
-    def crop(self, x, y, w, h):
-        """return a new image by cropping the picture to a width of w and a height of h, starting with the pixel at column x and row y."""
+    def crop(self, x: int, y: int, w: int, h: int):
+        """Return a new image by cropping the picture to a width of w and a height of h, starting with the pixel at column x and row y.
+        
+        Parameters:
+        -----------
+        x : The x position (int)
+
+        y : The y position (int)
+
+        w : The width (int)
+
+        h : The height (int)
+
+        Returns:
+        --------
+        image : The cropped image (Image)
+
+        Raises:
+        -------
+        TypeError if a parameter has an invalid type
+        """
         image = Image(width=w, height=h)
         image.blit(self, x, y, w, h)
         return image
 
     def copy(self):
+        """ Return a copy of the image 
+        
+        Returns:
+        --------
+        image : The copy of the image (Image)
+        """
         image = Image(width=self.__width, height=self.__height)
         for [x, y] in self.__pixels:
             image.set_pixel(x, y, self.__pixels[(x, y)])
         return image
 
     def invert(self):
-        """return a new image by inverting the brightness of the pixels in the source image."""
+        """Return a new image by inverting the brightness of the pixels in the source image.
+        
+        Returns:
+        --------
+        image : The image with inverted brightness (Image)
+        """
         image = Image(width=self.__width, height=self.__height)
         for [x, y] in self.__pixels:
             image.set_pixel(x, y, 9-self.get_pixel(x, y))
         return image
 
-    def fill(self, value):
-        """Set the brightness of all the pixels in the image to the value, which has to be between 0 (dark) and 9 (bright).
-        Cannot be used on inbuilt images."""
+    def fill(self, value: int):
+        """Set the brightness of all the pixels in the image to the value, which has to be between 0 (dark) and 9 (bright). Cannot be used on inbuilt images.
+        
+        Parameters:
+        -----------
+        value : The brightness used to fill the image (int)
+
+        Raises:
+        -------
+        TypeError if a parameter has an invalid type
+
+        ValueError if the value is not between 0 and 9
+
+        Exception if the image is readonly
+        """
         if not isinstance(value, int):
-            raise TypeError('%f must be an integer' % value)
-        elif 0 <= value and value < 10:
-            raise IndexError('%d is not between 0 and 9' % value)
+            raise TypeError(f'invalid type : {type(value)} is not a int')
+        if value < 0 and 9 < value:
+            raise ValueError(f'{value} is not between 0 and 9')
+        if self._readonly:
+            raise Exception('could not fill a readonly image')
         for [x, y] in self.__pixels:
             self.set_pixel(x, y, value)
 
-    def blit(self, src, x, y, w, h, xdest=0, ydest=0):
-        """Copy the rectangle defined by x, y, w, h from the image src into this image at xdest, ydest. Areas in the source rectangle, but outside the source image are treated as having a value of 0."""
+    def blit(self, src: Image, x: int, y: int, w: int, h: int, xdest: int = 0, ydest:int = 0):
+        """Copy the rectangle defined by x, y, w, h from the image src into this image at xdest, ydest. Areas in the source rectangle, but outside the source image are treated as having a value of 0.
+
+        Parameters:
+        -----------
+        src : The source image (Image)
+
+        x : The x position (int)
+
+        y : The y position (int)
+
+        w : The width (int)
+
+        h : The height (int)
+
+        xdest : The x destination position (optional - default: 0) (int)
+
+        ydest : The y destination position (optional - default: 0) (int)
+        """
         # Check the source image
         if not isinstance(src, Image):
             raise TypeError('src must be a Image')
@@ -172,12 +332,44 @@ class Image:
                 value = src.get_pixel(sx, sy)
                 self.set_pixel(dx, dy, value)
 
-    def __inImage(self, x, y):
-        return isinstance(x, int) and isinstance(y, int) and 0 <= x and x < self.__width and 0 <= y and y < self.__height
+    def __inImage(self, x: int, y: int) -> bool:
+        """ Check if the position is in the image
 
-    def __convertString(self, string):
+        Parameters:
+        -----------
+        x : The x position (int)
+
+        y : The y position (int)
+
+        Returns:
+        --------
+        inside : True if the position is inside, False otherwise
+
+        Raises:
+        -------
+        TypeError if a parameter has an invalid type
+        """
+        if not isinstance(x, int):
+            raise TypeError(f'invalid type : {type(x)} is not a int')
+        if not isinstance(y, int):
+            raise TypeError(f'invalid type : {type(y)} is not a int')
+        return 0 <= x and x < self.__width and 0 <= y and y < self.__height
+
+    def __convertString(self, string: str):
+        """ Read the string and set the pixels at the requested brightness
+        
+        Parameters:
+        -----------
+        string : The string (str)
+
+        Raises:
+        -------
+        TypeError if a parameter has an invalid type
+
+        ValueError if the string is invalid
+        """
         if not isinstance(string, str):
-            raise TypeError('%s is not a string' % string)
+            raise TypeError(f'invalid type : {type(string)} is not a str')
         lines = string.replace('\n', ':').split(':')
         # Get the length and the width
         self.__width = 0
@@ -200,6 +392,20 @@ class Image:
                 self.set_pixel(x, y, number)
 
     def __sum(self, other, add):
+        """ Add or sub the image with another image 
+
+        Parameters:
+        -----------
+        other : The other image (Image)
+
+        add : Add if True, sub otherwise (bool)
+
+        Raises:
+        -------
+        TypeError if a parameter has an invalid type
+
+        ValueError if the images have different size
+        """
         # Check add type
         if not isinstance(add, bool):
             raise TypeError('add must be a boolean')
@@ -210,9 +416,9 @@ class Image:
         if self.__width != other.width() or self.__height != other.height():
             raise ValueError('images must be the same size')
         # Create the new image
-        image = Image(width=width, height=height)
-        for y in range(height):
-            for x in range(width):
+        image = Image(width=self.__width, height=self.__height)
+        for y in range(self.__height):
+            for x in range(self.__width):
                 if add:
                     value = min(9, self.get_pixel(x, y) + other.get_pixel(x, y))
                 else:
@@ -220,21 +426,37 @@ class Image:
                 image.set_pixel(x, y, value)
         return image
 
-    def __dim(self, other, mul):
+    def __dim(self, value, mul):
+        """ Multiply every position brigthness by a multiplier
+
+        Parameters:
+        -----------
+        value : The value of the multiplier (float)
+
+        mul : Multiply if True, divise otherwise (bool)
+
+        Raises:
+        -------
+        TypeError if a parameter has an invalid type
+
+        ValueError if the images have different size
+
+        ValueError if the brightness multiplier is negative
+        """
         # Check mul type
         if not isinstance(mul, bool):
             raise TypeError('mul must be a boolean')
         # Check type
-        if not isinstance(other, (int, float)):
-            raise TypeError('unsupported operand type(s) for %s: ‘Image’ and ‘%s’' % ('*' if mul else '/', type(other)))
-        # Check other value
-        if other < 0:
-            raise TypeError('brightness multiplier must not be negative')
+        if not isinstance(value, (int, float)):
+            raise TypeError('unsupported operand type(s) for %s: ‘Image’ and ‘%s’' % ('*' if mul else '/', type(value)))
+        # Check value value
+        if value < 0:
+            raise ValueError('brightness multiplier must not be negative')
         # Create the new image
         image = Image(width=self.__width, height=self.__height)
         for y in range(self.__height):
             for x in range(self.__width):
-                value = round(self.get_pixel(x, y) * other)
+                value = round(self.get_pixel(x, y) * value)
                 value = max(0, min(9, value))
                 image.set_pixel(x, y, value)
         return image
@@ -269,6 +491,22 @@ class Image:
 
     @staticmethod
     def _constImage(string):
+        """ Create an readonly image from a string
+        
+        Parameters:
+        -----------
+        string : The string (str)
+
+        Returns:
+        --------
+        image : The constant image (Image)
+
+        Raises:
+        -------
+        TypeError if a parameter has an invalid type
+
+        ValueError if the string is invalid
+        """
         image = Image(string)
         image._readonly = True
         return image

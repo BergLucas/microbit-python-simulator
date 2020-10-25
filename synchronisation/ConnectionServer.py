@@ -11,18 +11,23 @@ class ConnectionServer:
 
         ip : The ip that is going to be accepted (optionnal - default:'') (str)
 
+        timeout: The timeout before the connection fail (optional - default: None) (float)
+        
         Raises:
         -------
         TypeError if a parameter has an invalid type
         
         Exception if the port is already in use
         """
+        if not isinstance(timeout, (float, int, type(None))):
+            raise TypeError(f'invalid type : {type(timeout)} is not a float')
         if not isinstance(port, int):
             raise TypeError(f'invalid type : {type(port)} is not int')
         if not isinstance(ip, str):
             raise TypeError(f'invalid type : {type(ip)} is not str')
         self.__alive = True
         self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.__socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.__socket.settimeout(timeout)
         self.__socket.bind((ip, port))
         self.__socket.listen()

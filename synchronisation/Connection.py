@@ -143,7 +143,7 @@ class Connection:
         -----------
         addr: The tuple ip, port (Tuple[str, int])
 
-        timeout: The timeout before the connection fail (float)
+        timeout: The timeout before the connection fail (optional - default: None) (float)
 
         Returns:
         --------
@@ -158,7 +158,7 @@ class Connection:
         ValueError if a parameter have an invalid value 
         """
         checkAddress(addr)
-        if not isinstance(timeout, (float, type(None))):
+        if not isinstance(timeout, (float, int, type(None))):
             raise TypeError(f'invalid type : {type(timeout)} is not a float')
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -176,18 +176,20 @@ class Connection:
         -----------
         addr: The tuple ip, port (Tuple[str, int])
 
-        timeout: The timeout before the connection fail (float)
+        timeout: The timeout before the connection fail (optional - default: None) (float)
 
         Returns:
         --------
         connection : The connection if connected succesfully, None otherwise (Union[Connection, None])
 
+        Raises:
+        -------
         TypeError if a parameter have an invalid type
 
         ValueError if a parameter have an invalid value 
         """
         checkAddress(addr)
-        if not isinstance(timeout, (float, type(None))):
+        if not isinstance(timeout, (float, int, type(None))):
             raise TypeError(f'invalid type : {type(timeout)} is not a float')
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -205,18 +207,20 @@ class Connection:
         -----------
         addr: The tuple ip, port (Tuple[str, int])
 
-        timeout: The timeout before the connection fail (float)
+        timeout: The timeout before the connection fail (optional - default: None) (float)
 
         Returns:
         --------
         open : True if the server listen, False otherwise (bool)
 
+        Raises:
+        -------
         TypeError if a parameter have an invalid type
         
         ValueError if a parameter have an invalid value 
         """
         checkAddress(addr)
-        if not isinstance(timeout, (float, type(None))):
+        if not isinstance(timeout, (float, int, type(None))):
             raise TypeError(f'invalid type : {type(timeout)} is not a float')
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)

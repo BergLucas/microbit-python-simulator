@@ -1,9 +1,8 @@
 from .display.Display import Display
 from .button.Button import Button
-from .MicrobitSimulatorThread import __MicrobitSimulatorThread
+from .MicrobitSimulatorThread import MicrobitSimulatorThread as __MicrobitSimulatorThread
 from .image.Image import Image
 from .accelerometer.Accelerometer import Accelerometer
-
 class _MicroBitDigitalPin:
     """Digital pin on the Micro:Bit board"""
 
@@ -172,39 +171,35 @@ __mcbsim_thread.start()
 __mcbsim = __mcbsim_thread.getMcbsim()
 
 # Create instances
-display = Display()
-display = __mcbsim.getDisplay()
+display: Display = __mcbsim.getDisplay()
 
-button_a = Button()
-button_a = __mcbsim.getButton('A')
-button_b = __mcbsim.getButton('B')
+button_a: Button = __mcbsim.getButton('A')
+button_b: Button = __mcbsim.getButton('B')
 
 spi = _spi()
 uart = _uart()
 i2c = _i2c()
 compass = _compass()
-accelerometer = Accelerometer()
-accelerometer = __mcbsim.getAccelerometer()
+accelerometer: Accelerometer = __mcbsim.getAccelerometer()
 
 # Microbit function
 
-def panic(error_code):
+def panic(error_code: int):
     """Enter a panic mode. Requires restart. Pass in an arbitrary integer <= 255 to indicate a status"""
     __mcbsim.panic(error_code)
 
 def reset():
     """Restart the board."""
-    """clear the display"""
     __mcbsim.reset()
 
-def sleep(milliseconds):
+def sleep(milliseconds: int):
     """Wait for n milliseconds. One second is 1000 milliseconds, so:"""
     __mcbsim.sleep(milliseconds)
 
-def running_time():
+def running_time() -> int:
     """Return the number of milliseconds since the board was switched on or restarted."""
     return __mcbsim.running_time()
 
-def temperature():
+def temperature() -> int:
     """Return the temperature of the micro:bit in degrees Celcius."""
     return __mcbsim.temperature()

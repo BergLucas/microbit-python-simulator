@@ -6,7 +6,7 @@ from typing import Union
 from threading import Lock
 class SynchronisationClient:
     def __init__(self, debug=False):
-        """ Client that can requests data from a validation server
+        """ Client that can requests data from a SynchronisationServer
 
         Parameters:
         -----------
