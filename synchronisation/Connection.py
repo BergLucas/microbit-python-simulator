@@ -182,6 +182,8 @@ class Connection:
         --------
         connection : The connection if connected succesfully, None otherwise (Union[Connection, None])
 
+        Raises:
+        -------
         TypeError if a parameter have an invalid type
 
         ValueError if a parameter have an invalid value 
@@ -211,6 +213,8 @@ class Connection:
         --------
         open : True if the server listen, False otherwise (bool)
 
+        Raises:
+        -------
         TypeError if a parameter have an invalid type
         
         ValueError if a parameter have an invalid value 

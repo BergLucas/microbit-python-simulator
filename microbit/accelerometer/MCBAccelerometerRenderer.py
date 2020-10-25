@@ -1,17 +1,49 @@
 from .MCBAccelerometer import MCBAccelerometer
-from .Options import *
-from tkinter import Frame, ttk, Scale, Label, Spinbox, Button, Grid, IntVar, StringVar
+from .Settings import *
+from tkinter import Frame, ttk, Scale, Label, Spinbox, Button, Grid, IntVar, StringVar, Widget
 from tkinter.font import Font
 
 class MCBAccelerometerRenderer(ttk.Notebook, MCBAccelerometer):
-    def __init__(self, master, width, height):
+    def __init__(self, master: Widget, width: int, height: int):
+        """ Create a MCBAccelerometerRenderer object
+        
+        Parameters:
+        -----------
+        master : The parent widget (Widget)
+
+        width : The width of the accelerometer (int)
+
+        height : The height of the accelerometer (int)
+
+        Raises:
+        -------
+        TypeError if a parameter has an invalid type
+
+        ValueError if height <= 0 or width <= 0
+        """
+        if not isinstance(master, Widget):
+            raise TypeError(f'invalid type : {type(master)} is not a Widget')
+        if not isinstance(width, int):
+            raise TypeError(f'invalid type : {type(width)} is not a int')
+        if not isinstance(height, int):
+            raise TypeError(f'invalid type : {type(height)} is not a int')
+        if height <= 0:
+            raise ValueError(f'invalid height : height can not be negative')
+        if width <= 0:
+            raise ValueError(f'invalid width : width can not be negative')
         ttk.Notebook.__init__(self, master, height=round(0.95*height), width=width)
         MCBAccelerometer.__init__(self)
         # Add sliders
         self.__add_slidersFrame(width)
         self.__add_gesturesFrame()
     
-    def __add_slidersFrame(self, width):
+    def __add_slidersFrame(self, width: int):
+        """ Add a sliders frame 
+        
+        Parameters:
+        -----------
+        width : The slidersFrame width (int)
+        """
         slidersFrame = Frame(self)
         slidersFrame.place()
         self.add(slidersFrame, text='Sliders')
@@ -30,7 +62,21 @@ class MCBAccelerometerRenderer(ttk.Notebook, MCBAccelerometer):
         z_slider = self.__add_slider(slidersFrame, slider_width, 'Z', lambda value: self.set_z(value), False)
         z_slider.grid(row=0, column=2, sticky='ns')
 
-    def __add_slider(self, master, width, name, value_callback, invertSlider):
+    def __add_slider(self, master: Widget, width: int, name: str, value_callback, invertSlider: bool):
+        """ Add a slider
+        
+        Parameters:
+        -----------
+        master : The parent widget (Widget)
+
+        width : The width of the slider (int)
+
+        name : The name of the slider (str)
+
+        value_callback : The callback on value change (function)
+
+        invertSlider : Invert the slider if True (bool)
+        """
         sliderFrame = Frame(master, width=width, bg='')
         sliderFrame.rowconfigure(2, weight=1)
         intValue = IntVar(sliderFrame, 0)
@@ -56,6 +102,7 @@ class MCBAccelerometerRenderer(ttk.Notebook, MCBAccelerometer):
         return sliderFrame
 
     def __add_gesturesFrame(self):
+        """ Add a gesturesFrame """
         gesturesFrame = Frame(self)
         gesturesFrame.place()
         self.add(gesturesFrame, text='Gestures')
@@ -72,7 +119,25 @@ class MCBAccelerometerRenderer(ttk.Notebook, MCBAccelerometer):
             gesture_id += 1
         self.__add_gesture(gesturesFrame, 10, 3, gesture_id//2, gesture_id%2, 'Stop gesture', lambda: self.stop_gesture())
 
-    def __add_gesture(self, master, width, height, row, column, name, value_callback):
+    def __add_gesture(self, master: Widget, width: int, height: int, row: int, column: int, name: str, value_callback):
+        """ Add a gesture
+        
+        Parameters:
+        -----------
+        master : The parent widget (Widget)
+
+        width : The width of the gesture frame (int)
+
+        height : The height of the gesture frame (int)
+
+        row : The row position of the gesture frame (int)
+
+        column : The row position of the gesture frame (int)
+
+        name : The name of the gesture frame (str)
+
+        value_callback : The callback on value change (function)
+        """
         gesture_button = Button(master, text=name, command=value_callback, padx=5, pady=5, width=width, height=height)
         master.rowconfigure(row, weight=1)
         master.columnconfigure(column, weight=1)

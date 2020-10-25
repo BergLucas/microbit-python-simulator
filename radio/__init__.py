@@ -19,7 +19,7 @@ def __startRadio():
     TypeError if a parameter has an invalid type
     """
     from .Radio import Radio
-    from .Options import SYNCHRONISATION_IP, SYNCHRONISATION_PORT, AUTO_START_SYNCHRONISATION_SERVER, BLUETOOTH_PORT, INTERVAL, TIMEOUT, DEBUG
+    from .Settings import SYNCHRONISATION_IP, SYNCHRONISATION_PORT, AUTO_START_SYNCHRONISATION_SERVER, BLUETOOTH_PORT, INTERVAL, TIMEOUT, DEBUG
     from synchronisation import Connection, checkAddress, SynchronisationServer
     # Check types
     if not isinstance(AUTO_START_SYNCHRONISATION_SERVER, bool):

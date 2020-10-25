@@ -184,23 +184,22 @@ accelerometer: Accelerometer = __mcbsim.getAccelerometer()
 
 # Microbit function
 
-def panic(error_code):
+def panic(error_code: int):
     """Enter a panic mode. Requires restart. Pass in an arbitrary integer <= 255 to indicate a status"""
     __mcbsim.panic(error_code)
 
 def reset():
     """Restart the board."""
-    """clear the display"""
     __mcbsim.reset()
 
-def sleep(milliseconds):
+def sleep(milliseconds: int):
     """Wait for n milliseconds. One second is 1000 milliseconds, so:"""
     __mcbsim.sleep(milliseconds)
 
-def running_time():
+def running_time() -> int:
     """Return the number of milliseconds since the board was switched on or restarted."""
     return __mcbsim.running_time()
 
-def temperature():
+def temperature() -> int:
     """Return the temperature of the micro:bit in degrees Celcius."""
     return __mcbsim.temperature()
