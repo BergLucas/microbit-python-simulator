@@ -219,9 +219,7 @@ game_is_over = False
 
 while not game_is_over:
     # show score (number of pieces dropped)
-    print('show')
     microbit.display.show(nb_dropped_pieces)
-    print('show done')
 
     # create a new piece in the top left corner
     piece = pieces[random.randint(0, len(pieces) - 1)]

@@ -286,7 +286,7 @@ class Image:
         """
         if not isinstance(value, int):
             raise TypeError(f'invalid type : {type(value)} is not a int')
-        if 0 <= value and value < 10:
+        if value < 0 and 9 < value:
             raise ValueError(f'{value} is not between 0 and 9')
         if self._readonly:
             raise Exception('could not fill a readonly image')
