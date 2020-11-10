@@ -13,7 +13,7 @@ class MicrobitSimulatorThread(Thread):
         """ Run the MicrobitSimulator thread """
         self.__mcbsim = MicrobitSimulator()
         self.__mcbsim.mainloop()
-        if main_thread().isAlive():
+        if main_thread().is_alive():
             interrupt_main()
 
     def getMcbsim(self) -> MicrobitSimulator:
@@ -23,6 +23,6 @@ class MicrobitSimulatorThread(Thread):
         --------
         microbit : The MicrobitSimulator (MicrobitSimulator)
         """
-        while self.__mcbsim == None and self.isAlive():
+        while self.__mcbsim == None and self.is_alive():
             self.join(0.1)
         return self.__mcbsim
