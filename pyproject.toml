@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "microbit-python-simulator"
+version = "0.1.0"
+description = "A microbit simulator built with Python"
+authors = ["Lucas Berg <55436804+BergLucas@users.noreply.github.com>"]
+readme = "README.md"
+packages = [
+    {include = "microbit", from = "src"},
+    {include = "radio", from = "src"}
+]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
