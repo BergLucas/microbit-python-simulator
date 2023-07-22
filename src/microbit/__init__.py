@@ -3,6 +3,9 @@ from .button.Button import Button
 from .MicrobitSimulatorThread import MicrobitSimulatorThread as __MicrobitSimulatorThread
 from .image.Image import Image
 from .accelerometer.Accelerometer import Accelerometer
+from typing import Union
+from microbit._internal import microbit as __microbit
+
 class _MicroBitDigitalPin:
     """Digital pin on the Micro:Bit board"""
 
@@ -167,39 +170,61 @@ class _compass:
 # Start the microbit simulator
 
 __mcbsim_thread = __MicrobitSimulatorThread()
-__mcbsim_thread.start()
-__mcbsim = __mcbsim_thread.getMcbsim()
+#__mcbsim_thread.start()
+#__mcbsim = __mcbsim_thread.getMcbsim()
 
 # Create instances
-display: Display = __mcbsim.getDisplay()
+#display: Display = __mcbsim.getDisplay()
 
-button_a: Button = __mcbsim.getButton('A')
-button_b: Button = __mcbsim.getButton('B')
+#button_a: Button = __mcbsim.getButton('A')
+#button_b: Button = __mcbsim.getButton('B')
 
 spi = _spi()
 uart = _uart()
 i2c = _i2c()
 compass = _compass()
-accelerometer: Accelerometer = __mcbsim.getAccelerometer()
+#accelerometer: Accelerometer = __mcbsim.getAccelerometer()
 
-# Microbit function
+# Microbit functions
 
-def panic(error_code: int):
-    """Enter a panic mode. Requires restart. Pass in an arbitrary integer <= 255 to indicate a status"""
-    __mcbsim.panic(error_code)
+def panic(error_code: int) -> None:
+    """Enter a panic mode that stops all execution, scrolls an error code in the micro:bit display and requires restart:
 
-def reset():
+    ```python
+    microbit.panic(255)
+    ```
+
+    Args:
+        n (int): An arbitrary integer between 0 and 255 to indicate an error code.
+    """
+    __microbit.panic(error_code)
+
+def reset() -> None:
     """Restart the board."""
-    __mcbsim.reset()
+    __microbit.reset()
 
-def sleep(milliseconds: int):
-    """Wait for n milliseconds. One second is 1000 milliseconds, so:"""
-    __mcbsim.sleep(milliseconds)
+def sleep(n: Union[int, float]) -> None:
+    """Wait for `n` milliseconds.
 
-def running_time() -> int:
-    """Return the number of milliseconds since the board was switched on or restarted."""
-    return __mcbsim.running_time()
+    One second is 1000 milliseconds, so `microbit.sleep(1000)`
+    will pause the execution for one second.
+
+    Args:
+        n (Union[int, float]) : An integer or floating point number indicating the number of milliseconds to wait."""
+    __microbit.sleep(n)
+
+def running_time() -> Union[int, float]:
+    """Returns the number of milliseconds since the board was switched on or restarted.
+
+    Returns:
+        Union[int, float] : The number of milliseconds since the board was switched on or restarted.
+    """
+    return __microbit.running_time()
 
 def temperature() -> int:
-    """Return the temperature of the micro:bit in degrees Celcius."""
-    return __mcbsim.temperature()
+    """Returns the temperature of the micro:bit in degrees Celcius.
+
+    Returns:
+        int : An integer with the temperature of the micro:bit in degrees Celcius.
+    """
+    return __microbit.temperature()
