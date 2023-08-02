@@ -1,4 +1,8 @@
-from microbit_protocol.commands.microbit import MicrobitPanicCommand, MicrobitResetCommand, MicrobitTemperatureCommand
+from microbit_protocol.commands.microbit import (
+    MicrobitPanicCommand,
+    MicrobitResetCommand,
+    MicrobitTemperatureCommand,
+)
 from microbit_protocol.exceptions import ConnectionClosed
 from microbit_protocol.commands import MicrobitCommand
 from microbit_protocol.peer import MicrobitPeer
@@ -9,6 +13,7 @@ import logging
 import time
 
 logger = logging.getLogger(__name__)
+
 
 class Microbit:
     def __init__(self, peer: MicrobitPeer) -> None:

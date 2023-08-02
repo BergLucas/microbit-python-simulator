@@ -2,10 +2,12 @@ from threading import Lock
 from copy import deepcopy
 from typing import Dict, List, Tuple, Union
 import json
+
 Address = Tuple[str, int]
 
+
 def checkAddress(address: Address):
-    """ Check if the address is valid.
+    """Check if the address is valid.
 
     Parameters:
     -----------
@@ -17,19 +19,20 @@ def checkAddress(address: Address):
     """
     # Check the address
     if not isinstance(address, (list, tuple)) or len(address) != 2:
-        raise TypeError('The address must be a tuple of length 2')
+        raise TypeError("The address must be a tuple of length 2")
     ip, port = address
     if not isinstance(ip, str):
-        raise TypeError('The ip must be a str')
+        raise TypeError("The ip must be a str")
     if not isinstance(port, int):
-        raise TypeError('The port must be a int')
+        raise TypeError("The port must be a int")
+
 
 class AddressesLinker:
     def __init__(self):
-        """ A class that link addresses (ip, port) to values. This class is thread-safe """
+        """A class that link addresses (ip, port) to values. This class is thread-safe"""
         self.__addresses = {}
         self.__addresses_lock = Lock()
-    
+
     @property
     def addresses(self):
         self.__addresses_lock.acquire()
@@ -38,12 +41,12 @@ class AddressesLinker:
         return addresses
 
     def linkAddress(self, address: Address, value: str) -> None:
-        """ Link the address with a value. This method is thread-safe.
+        """Link the address with a value. This method is thread-safe.
 
         Parameters:
         -----------
         address: The address (ip, port) which is going to be linked (Tuple[str, int])
-        
+
         value: The value which is going to be linked. (str)
 
         Raises:
@@ -53,14 +56,14 @@ class AddressesLinker:
         # Check the parameters
         checkAddress(address)
         if not isinstance(value, str):
-            raise TypeError(f'invalid type : {type(value)} is not str')
+            raise TypeError(f"invalid type : {type(value)} is not str")
         # Link the address to the value
         self.__addresses_lock.acquire()
         self.__addresses[address] = value
         self.__addresses_lock.release()
-    
+
     def unlinkAddress(self, address: Address) -> None:
-        """ Unlink the address. This method is thread-safe.
+        """Unlink the address. This method is thread-safe.
 
         Parameters:
         -----------
@@ -79,7 +82,7 @@ class AddressesLinker:
         self.__addresses_lock.release()
 
     def mergeAddressesLinker(self, addressesLinker) -> None:
-        """ Merge the new AddressesLinker with the current AddressesLinker. This method is thread-safe.
+        """Merge the new AddressesLinker with the current AddressesLinker. This method is thread-safe.
 
         Parameters:
         -----------
@@ -91,15 +94,19 @@ class AddressesLinker:
         """
         # Check if addresses is a dict
         if not isinstance(addressesLinker, AddressesLinker):
-            raise TypeError(f'invalid type : {type(addressesLinker)} is not an AddressesLinker')
-        
+            raise TypeError(
+                f"invalid type : {type(addressesLinker)} is not an AddressesLinker"
+            )
+
         # Merge the addresses
         self.__addresses_lock.acquire()
         self.__addresses.update(addressesLinker.addresses)
         self.__addresses_lock.release()
 
-    def getAddresses(self, addresses: Union[Tuple[Address], List[Address]]) -> Dict[str, List[Address]]:
-        """ Get the values which are linked to the addresses. This method is thread-safe.
+    def getAddresses(
+        self, addresses: Union[Tuple[Address], List[Address]]
+    ) -> Dict[str, List[Address]]:
+        """Get the values which are linked to the addresses. This method is thread-safe.
 
         Parameters:
         -----------
@@ -115,7 +122,7 @@ class AddressesLinker:
         """
         # Check if the addresses has a valid type
         if not isinstance(addresses, (tuple, list)):
-            raise TypeError('addresses must be a tuple or a list')
+            raise TypeError("addresses must be a tuple or a list")
         # Get the linked addresses
         linked_addresses = {}
         self.__addresses_lock.acquire()
@@ -130,7 +137,7 @@ class AddressesLinker:
         return linked_addresses
 
     def existsAddresses(self, addresses: Union[Tuple[Address], List[Address]]) -> bool:
-        """ Check if the addresses exists. This method is thread-safe.
+        """Check if the addresses exists. This method is thread-safe.
 
         Parameters:
         -----------
@@ -148,8 +155,10 @@ class AddressesLinker:
         self.__addresses_lock.release()
         return exists
 
-    def getValues(self, values: Union[Tuple[str], List[str]]) -> Dict[str, List[Address]]:
-        """ Get the addresses which are linked with requested values. This method is thread-safe.
+    def getValues(
+        self, values: Union[Tuple[str], List[str]]
+    ) -> Dict[str, List[Address]]:
+        """Get the addresses which are linked with requested values. This method is thread-safe.
 
         Parameters:
         -----------
@@ -165,10 +174,10 @@ class AddressesLinker:
         """
         # Check if the values has a valid type
         if not isinstance(values, (tuple, list)):
-            raise TypeError('values must be a tuple or a list')
+            raise TypeError("values must be a tuple or a list")
         for value in values:
             if not isinstance(value, str):
-                raise TypeError(f'invalid type : {type(value)} is not str')
+                raise TypeError(f"invalid type : {type(value)} is not str")
         # Get the linked addresses
         linked_addresses = {}
         self.__addresses_lock.acquire()
@@ -182,7 +191,7 @@ class AddressesLinker:
         return linked_addresses
 
     def existsValues(self, values: Union[Tuple[str], List[str]]) -> bool:
-        """ Check if the values exists. This method is thread-safe.
+        """Check if the values exists. This method is thread-safe.
 
         Parameters:
         -----------
@@ -207,7 +216,7 @@ class AddressesLinker:
         return True
 
     def toJSON(self) -> bytes:
-        """ Serialize the addressesLinker
+        """Serialize the addressesLinker
 
         Returns:
         --------
@@ -227,12 +236,12 @@ class AddressesLinker:
 
     @staticmethod
     def fromJSON(serialised_adresseslinker: bytes):
-        """ Deserialize the addressesLinker
-        
+        """Deserialize the addressesLinker
+
         Parameters:
         -----------
         serialised_adressesLinker : The serialised adresseslinker (bytes)
-        
+
         Returns:
         --------
         adressesLinker : The addressesLinker (AdressesLinker)
@@ -244,9 +253,13 @@ class AddressesLinker:
         """
         # Check the encoded addresses
         if not isinstance(serialised_adresseslinker, bytes):
-            raise TypeError(f'invalid type : {type(serialised_adresseslinker)} is not bytes')
+            raise TypeError(
+                f"invalid type : {type(serialised_adresseslinker)} is not bytes"
+            )
         try:
-            values_dict: Dict[str, Tuple[str, int]] = json.loads(serialised_adresseslinker)
+            values_dict: Dict[str, Tuple[str, int]] = json.loads(
+                serialised_adresseslinker
+            )
             addressesLinker = AddressesLinker()
             for value in values_dict:
                 for addr in values_dict[value]:
@@ -254,4 +267,6 @@ class AddressesLinker:
             return addressesLinker
         except Exception as e:
             print(e)
-            raise ValueError(f'invalid value : serialised_adresseslinker has an invalid value')
+            raise ValueError(
+                f"invalid value : serialised_adresseslinker has an invalid value"
+            )

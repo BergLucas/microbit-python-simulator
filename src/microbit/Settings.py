@@ -1,2 +1,2 @@
-BUTTON_A = 'a'
-BUTTON_B = 'b'
+BUTTON_A = "a"
+BUTTON_B = "b"

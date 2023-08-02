@@ -1,7 +1,11 @@
 from __future__ import annotations
 from microbit_protocol.exceptions import ConnectionClosed
 from microbit_protocol.commands import MicrobitCommandAdapter, MicrobitCommand
-from websockets.exceptions import ConnectionClosedError, ConnectionClosedOK, ConnectionClosed as WebsocketConnectionClosed
+from websockets.exceptions import (
+    ConnectionClosedError,
+    ConnectionClosedOK,
+    ConnectionClosed as WebsocketConnectionClosed,
+)
 from websockets.extensions.permessage_deflate import enable_server_permessage_deflate
 from websockets.sync.connection import Connection
 from websockets.sync.server import ServerConnection
@@ -16,8 +20,8 @@ import socket
 
 logger = logging.getLogger(__name__)
 
-class MicrobitPeer:
 
+class MicrobitPeer:
     @classmethod
     def connect(cls, host: str, port: int) -> MicrobitPeer:
         websocket = connect(f"ws://{host}:{port}")

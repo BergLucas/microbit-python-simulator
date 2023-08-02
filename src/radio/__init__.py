@@ -7,9 +7,11 @@ Documentation: https://microbit-micropython.readthedocs.io/fr/latest/radio.html
 """
 from .Radio import RATE_250KBIT, RATE_1MBIT, RATE_2MBIT
 from typing import Tuple, Union
+
+
 def __startRadio():
-    """ Start a radio 
-    
+    """Start a radio
+
     Returns:
     --------
     radio : The radio (Radio)
@@ -19,34 +21,48 @@ def __startRadio():
     TypeError if a parameter has an invalid type
     """
     from .Radio import Radio
-    from .Settings import SYNCHRONISATION_IP, SYNCHRONISATION_PORT, AUTO_START_SYNCHRONISATION_SERVER, BLUETOOTH_PORT, INTERVAL, TIMEOUT, DEBUG
+    from .Settings import (
+        SYNCHRONISATION_IP,
+        SYNCHRONISATION_PORT,
+        AUTO_START_SYNCHRONISATION_SERVER,
+        BLUETOOTH_PORT,
+        INTERVAL,
+        TIMEOUT,
+        DEBUG,
+    )
     from synchronisation import Connection, checkAddress, SynchronisationServer
+
     # Check types
     if not isinstance(AUTO_START_SYNCHRONISATION_SERVER, bool):
-        raise TypeError(f'invalid type : {type(AUTO_START_SYNCHRONISATION_SERVER)} is not bool')
+        raise TypeError(
+            f"invalid type : {type(AUTO_START_SYNCHRONISATION_SERVER)} is not bool"
+        )
     if not isinstance(SYNCHRONISATION_PORT, int):
-        raise TypeError(f'invalid type : {type(SYNCHRONISATION_PORT)} is not int')
+        raise TypeError(f"invalid type : {type(SYNCHRONISATION_PORT)} is not int")
     if not isinstance(TIMEOUT, (int, type(None))):
-        raise TypeError(f'invalid type : {type(TIMEOUT)} is not int')
+        raise TypeError(f"invalid type : {type(TIMEOUT)} is not int")
     # Find the SynchronisationServer
     if SYNCHRONISATION_IP is None:
         SYNCHRONISATION_IP = __find_sync_server(SYNCHRONISATION_PORT, TIMEOUT)
         if SYNCHRONISATION_IP is None:
-            SYNCHRONISATION_IP = '127.0.0.1'
+            SYNCHRONISATION_IP = "127.0.0.1"
     sync_address = (SYNCHRONISATION_IP, SYNCHRONISATION_PORT)
     checkAddress(sync_address)
     # Check if the server is on
     if not Connection.isPortOpen(sync_address, TIMEOUT):
         if AUTO_START_SYNCHRONISATION_SERVER:
             SynchronisationServer(SYNCHRONISATION_PORT, DEBUG).start()
-            sync_address = ('127.0.0.1', SYNCHRONISATION_PORT)
+            sync_address = ("127.0.0.1", SYNCHRONISATION_PORT)
         else:
-            raise ConnectionError('Could not connect to the SynchronisationServer')
-    return Radio(sync_address, BLUETOOTH_PORT, interval=INTERVAL, timeout=TIMEOUT, debug=DEBUG)
+            raise ConnectionError("Could not connect to the SynchronisationServer")
+    return Radio(
+        sync_address, BLUETOOTH_PORT, interval=INTERVAL, timeout=TIMEOUT, debug=DEBUG
+    )
+
 
 def __find_sync_server(port: int, timeout: int = None) -> Union[str, None]:
-    """ Find the ip of a synchronisation server 
-    
+    """Find the ip of a synchronisation server
+
     Parameters:
     -----------
     port : The port to check (int)
@@ -63,14 +79,15 @@ def __find_sync_server(port: int, timeout: int = None) -> Union[str, None]:
     """
     # Check types
     if not isinstance(port, int):
-        raise TypeError(f'invalid type : {type(port)} is not int')
+        raise TypeError(f"invalid type : {type(port)} is not int")
     if not isinstance(timeout, (int, type(None))):
-        raise TypeError(f'invalid type : {type(timeout)} is not int')
+        raise TypeError(f"invalid type : {type(timeout)} is not int")
     # Init
     import socket
     from synchronisation import Connection
     from threading import Thread, Lock
     from queue import Queue
+
     ips_queue = Queue()
     ips_lock = Lock()
     ip_list = []
@@ -78,10 +95,10 @@ def __find_sync_server(port: int, timeout: int = None) -> Union[str, None]:
     threads = []
     # Get the ip
     for ip in socket.gethostbyname_ex(socket.gethostname())[-1]:
-        ip_parts = ip.split('.')
+        ip_parts = ip.split(".")
         if len(ip_parts) > 3:
             for i in range(256):
-                ips_queue.put(f'{ip_parts[0]}.{ip_parts[1]}.{ip_parts[2]}.{i}')
+                ips_queue.put(f"{ip_parts[0]}.{ip_parts[1]}.{ip_parts[2]}.{i}")
     # Create the ping function
     def ping():
         continue_ping = True
@@ -103,9 +120,10 @@ def __find_sync_server(port: int, timeout: int = None) -> Union[str, None]:
                     ip_list.append(target_ip)
                 ip_lock.release()
                 continue_ping = False
+
     # Check the localhost
-    if Connection.isPortOpen(('127.0.0.1', port)):
-        ip_list.append('127.0.0.1')
+    if Connection.isPortOpen(("127.0.0.1", port)):
+        ip_list.append("127.0.0.1")
     else:
         # Create the threads
         for i in range(256):
@@ -121,18 +139,22 @@ def __find_sync_server(port: int, timeout: int = None) -> Union[str, None]:
     else:
         return ip_list[0]
 
+
 __radio = __startRadio()
 
+
 def on():
-    """ Turns the radio on. This needs to be explicitly called since the radio draws power and takes up memory that you may otherwise need. """
+    """Turns the radio on. This needs to be explicitly called since the radio draws power and takes up memory that you may otherwise need."""
     __radio.on()
 
+
 def off():
-    """ Turns off the radio, thus saving power and memory. """
+    """Turns off the radio, thus saving power and memory."""
     __radio.off()
 
+
 def config(**kwargs):
-    """ Configures various keyword based settings relating to the radio. The available settings and their sensible default values are listed below.
+    """Configures various keyword based settings relating to the radio. The available settings and their sensible default values are listed below.
 
     The length (default=32) defines the maximum length, in bytes, of a message sent via the radio. It can be up to 251 bytes long (254 - 3 bytes for S0, LENGTH and S1 preamble).
 
@@ -152,32 +174,38 @@ def config(**kwargs):
     """
     __radio.config(**kwargs)
 
+
 def reset():
     """Reset the settings to their default values (as listed in the documentation for the config function above)."""
     __radio.reset()
 
+
 def send_bytes(message: bytes):
-    """ Sends a message containing bytes. """
+    """Sends a message containing bytes."""
     __radio.send_bytes(message)
 
+
 def receive_bytes() -> bytes:
-    """ Receive the next incoming message on the message queue.
+    """Receive the next incoming message on the message queue.
     Returns None if there are no pending messages. Messages are returned as bytes.
     """
     return __radio.receive_bytes()
 
+
 def receive_bytes_into(buffer):
-    """ DOESNT WORK YET - Receive the next incoming message on the message queue.
+    """DOESNT WORK YET - Receive the next incoming message on the message queue.
     Copies the message into buffer, trimming the end of the message if necessary.
     Returns None if there are no pending messages, otherwise it returns the length of the message (which might be more than the length of the buffer)."""
     return __radio.receive_bytes_into(buffer)
 
+
 def send(message: str):
-    """ Sends a message string. This is the equivalent of send_bytes(bytes(message, 'utf8')) but with b'\\x01\\x00\\x01' prepended to the front (to make it compatible with other platforms that target the micro:bit). """
+    """Sends a message string. This is the equivalent of send_bytes(bytes(message, 'utf8')) but with b'\\x01\\x00\\x01' prepended to the front (to make it compatible with other platforms that target the micro:bit)."""
     __radio.send(message)
 
+
 def receive() -> str:
-    """ Works in exactly the same way as receive_bytes but returns whatever was sent.
+    """Works in exactly the same way as receive_bytes but returns whatever was sent.
 
     Currently, it’s equivalent to str(receive_bytes(), 'utf8') but with a check that the the first three bytes are b'\x01\x00\x01' (to make it compatible with other platforms that may target the micro:bit). It strips the prepended bytes before converting to a string.
 
@@ -185,8 +213,9 @@ def receive() -> str:
     """
     return __radio.receive()
 
+
 def receive_full() -> Tuple[bytes, int, int]:
-    """ Returns a tuple containing three values representing the next incoming message on the message queue. If there are no pending messages then None is returned.
+    """Returns a tuple containing three values representing the next incoming message on the message queue. If there are no pending messages then None is returned.
 
     The three values in the tuple represent:
 

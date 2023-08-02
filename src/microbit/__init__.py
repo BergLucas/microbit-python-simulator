@@ -1,10 +1,13 @@
 from .display.Display import Display
 from .button.Button import Button
-from .MicrobitSimulatorThread import MicrobitSimulatorThread as __MicrobitSimulatorThread
+from .MicrobitSimulatorThread import (
+    MicrobitSimulatorThread as __MicrobitSimulatorThread,
+)
 from .image.Image import Image
 from .accelerometer.Accelerometer import Accelerometer
 from typing import Union
 from microbit._internal import microbit as __microbit
+
 
 class _MicroBitDigitalPin:
     """Digital pin on the Micro:Bit board"""
@@ -19,6 +22,7 @@ class _MicroBitDigitalPin:
 
     def __init__(self):
         a = 0
+
 
 class _MicroBitAnalogDigitalPin:
     """Analog (PWM) pin on the Micro:Bit board"""
@@ -42,6 +46,7 @@ class _MicroBitAnalogDigitalPin:
     def __init__(self):
         a = 0
 
+
 class _MicroBitTouchPin:
     """Touch sensitive pin on the Micro:Bit board"""
 
@@ -52,6 +57,7 @@ class _MicroBitTouchPin:
     def __init__(self):
         a = 0
 
+
 class _MicroBitAnalogDigitalPinReadOnly:
     """Read only PWM pin"""
 
@@ -61,6 +67,7 @@ class _MicroBitAnalogDigitalPinReadOnly:
 
     def __init__(self):
         a = 0
+
 
 pin0 = _MicroBitTouchPin()
 pin1 = _MicroBitTouchPin()
@@ -82,8 +89,11 @@ pin16 = _MicroBitDigitalPin()
 pin19 = _MicroBitDigitalPin()
 pin20 = _MicroBitDigitalPin()
 
+
 class _spi:
-    def init(self, baudrate=1000000, bits=8, mode=0, sclk=pin13, mosi=pin15, miso=pin14):
+    def init(
+        self, baudrate=1000000, bits=8, mode=0, sclk=pin13, mosi=pin15, miso=pin14
+    ):
         """see: https://microbit-micropython.readthedocs.io/en/latest/spi.html"""
 
     def read(self, nbytes):
@@ -94,6 +104,7 @@ class _spi:
 
     def write_readinto(self, out, inBuffer):
         """Write the out buffer to the bus and read any response into the in buffer. The length of the buffers should be the same. The buffers can be the same object."""
+
 
 class _uart:
     def init(self, baudrate=9600, bits=8, parity=None, stop=1, *, tx=None, rx=None):
@@ -110,21 +121,22 @@ class _uart:
 
     def readInto(self, buf, nBytes=None):
         """Read bytes into the buf. If nbytes is specified then read at most that many bytes. Otherwise, read at most len(buf) bytes.
-    Return value: number of bytes read and stored into buf or None on timeout."""
+        Return value: number of bytes read and stored into buf or None on timeout."""
 
     def readline(self):
         """Read a line, ending in a newline character.
-    Return value: the line read or None on timeout. The newline character is included in the returned bytes."""
+        Return value: the line read or None on timeout. The newline character is included in the returned bytes."""
 
     def write(self, buf):
         """Write the buffer to the bus, it can be a bytes object or a string.
         Return value: number of bytes written or None on timeout."""
 
+
 class _i2c:
     def init(self, freq=100000, sda=pin20, scl=pin19):
         """Re-initialize peripheral with the specified clock frequency freq on the specified sda and scl pins.
-    Warning
-    Changing the I²C pins from defaults will make the accelerometer and compass stop working, as they are connected internally to those pins."""
+        Warning
+        Changing the I²C pins from defaults will make the accelerometer and compass stop working, as they are connected internally to those pins."""
 
     def scan(self):
         """Scan the bus for devices. Returns a list of 7-bit addresses corresponding to those devices that responded to the scan."""
@@ -135,6 +147,7 @@ class _i2c:
 
     def write(self, addr, buf, repeat=False):
         """Write bytes from buf to the device with 7-bit address addr. If repeat is True, no stop bit will be sent."""
+
 
 class _compass:
     def calibrate(self):
@@ -167,25 +180,27 @@ class _compass:
         """Returns an integer indication of the magnitude of the magnetic field around the device in nano tesla."""
         return 0
 
+
 # Start the microbit simulator
 
 __mcbsim_thread = __MicrobitSimulatorThread()
-#__mcbsim_thread.start()
-#__mcbsim = __mcbsim_thread.getMcbsim()
+# __mcbsim_thread.start()
+# __mcbsim = __mcbsim_thread.getMcbsim()
 
 # Create instances
-#display: Display = __mcbsim.getDisplay()
+# display: Display = __mcbsim.getDisplay()
 
-#button_a: Button = __mcbsim.getButton('A')
-#button_b: Button = __mcbsim.getButton('B')
+# button_a: Button = __mcbsim.getButton('A')
+# button_b: Button = __mcbsim.getButton('B')
 
 spi = _spi()
 uart = _uart()
 i2c = _i2c()
 compass = _compass()
-#accelerometer: Accelerometer = __mcbsim.getAccelerometer()
+# accelerometer: Accelerometer = __mcbsim.getAccelerometer()
 
 # Microbit functions
+
 
 def panic(error_code: int) -> None:
     """Enter a panic mode that stops all execution, scrolls an error code in the micro:bit display and requires restart:
@@ -199,9 +214,11 @@ def panic(error_code: int) -> None:
     """
     __microbit.panic(error_code)
 
+
 def reset() -> None:
     """Restart the board."""
     __microbit.reset()
+
 
 def sleep(n: Union[int, float]) -> None:
     """Wait for `n` milliseconds.
@@ -213,6 +230,7 @@ def sleep(n: Union[int, float]) -> None:
         n (Union[int, float]) : An integer or floating point number indicating the number of milliseconds to wait."""
     __microbit.sleep(n)
 
+
 def running_time() -> Union[int, float]:
     """Returns the number of milliseconds since the board was switched on or restarted.
 
@@ -220,6 +238,7 @@ def running_time() -> Union[int, float]:
         Union[int, float] : The number of milliseconds since the board was switched on or restarted.
     """
     return __microbit.running_time()
+
 
 def temperature() -> int:
     """Returns the temperature of the micro:bit in degrees Celcius.

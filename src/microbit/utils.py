@@ -1,6 +1,6 @@
 def rgb(r, g, b):
-    """ Convert rgb to hexadecimal value 
-    
+    """Convert rgb to hexadecimal value
+
     Parameters:
     -----------
     r : The red value (int)
@@ -8,9 +8,9 @@ def rgb(r, g, b):
     g : The green value (int)
 
     b : The blue value (int)
-    
+
     Returns:
     --------
     hexa : The hexadecimal value (str)
     """
-    return '#%02x%02x%02x' % (r, g, b)
+    return "#%02x%02x%02x" % (r, g, b)
