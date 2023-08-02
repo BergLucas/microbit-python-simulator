@@ -7,9 +7,9 @@ from microbit_protocol.commands.microbit import (
 from microbit_protocol.exceptions import CommunicationClosed
 from microbit_protocol.commands import MicrobitCommand
 from microbit_protocol.peer import MicrobitPeer
-from microbit._internal.microbit.button import MicrobitButton, Button
+from microbit._internal.button import MicrobitButton, Button
 from _thread import interrupt_main
-from typing import Union, Protocol
+from typing import Union
 from threading import Thread
 import logging
 import time
