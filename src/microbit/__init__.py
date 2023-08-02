@@ -1,6 +1,3 @@
-from .MicrobitSimulatorThread import (
-    MicrobitSimulatorThread as __MicrobitSimulatorThread,
-)
 from typing import Union
 from microbit._internal import microbit as __microbit
 from microbit._internal.microbit.image import Image
@@ -178,15 +175,6 @@ class _compass:
         return 0
 
 
-# Start the microbit simulator
-
-__mcbsim_thread = __MicrobitSimulatorThread()
-# __mcbsim_thread.start()
-# __mcbsim = __mcbsim_thread.getMcbsim()
-
-# Create instances
-# display: Display = __mcbsim.getDisplay()
-
 button_a = __microbit.button_a
 button_b = __microbit.button_b
 
@@ -194,7 +182,6 @@ spi = _spi()
 uart = _uart()
 i2c = _i2c()
 compass = _compass()
-# accelerometer: Accelerometer = __mcbsim.getAccelerometer()
 
 # Microbit functions
 

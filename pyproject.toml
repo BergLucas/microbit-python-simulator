@@ -7,6 +7,7 @@ readme = "README.md"
 packages = [
     {include = "microbit", from = "src"},
     {include = "microbit_protocol", from = "src"},
+    {include = "microbit_simulator", from = "src"},
     {include = "radio", from = "src"}
 ]
 
