@@ -1,4 +1,4 @@
-from microbit._internal.microbit.image import Image
+from microbit._internal.image import Image
 from tkinter import Frame, Canvas, Widget
 from typing import Union, Iterable
 from threading import Thread
