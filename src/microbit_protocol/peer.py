@@ -12,23 +12,58 @@ from websockets.sync.server import ServerConnection
 from websockets.server import ServerProtocol
 from websockets.sync.client import connect
 from threading import Thread, main_thread
-from typing import Callable, Optional, Type
+from typing import Callable, Optional, Type, Protocol
 from pydantic import ValidationError
 from types import TracebackType
+from enum import Enum, auto
 import logging
 import socket
 
 logger = logging.getLogger(__name__)
 
 
-class MicrobitPeer:
+class ExitStatus(Enum):
+    SUCCESS = auto()
+    ERROR = auto()
+
+
+class MicrobitPeer(Protocol):
+    def send_command(self, command: MicrobitCommand) -> None:
+        ...
+
+    @property
+    def is_listening(self) -> bool:
+        ...
+
+    def listen(self, listener: Callable[[MicrobitCommand], None]) -> None:
+        ...
+
+    def stop(self) -> None:
+        ...
+
+    def close(self, code: ExitStatus = ExitStatus.SUCCESS, reason: str = "") -> None:
+        ...
+
+    def __enter__(self) -> MicrobitPeer:
+        ...
+
+    def __exit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc_value: Optional[BaseException],
+        traceback: Optional[TracebackType],
+    ) -> None:
+        ...
+
+
+class MicrobitWebsocketPeer(MicrobitPeer):
     @classmethod
-    def connect(cls, host: str, port: int) -> MicrobitPeer:
+    def connect(cls, host: str, port: int) -> MicrobitWebsocketPeer:
         websocket = connect(f"ws://{host}:{port}")
-        return MicrobitPeer(websocket)
+        return MicrobitWebsocketPeer(websocket)
 
     @classmethod
-    def wait_for_connection(cls, host: str, port: int) -> MicrobitPeer:
+    def wait_for_connection(cls, host: str, port: int) -> MicrobitWebsocketPeer:
         extensions = enable_server_permessage_deflate(None)
 
         server_socket = socket.create_server((host, port))
@@ -49,7 +84,7 @@ class MicrobitPeer:
 
             server_socket.close()
 
-            return MicrobitPeer(connection)
+            return MicrobitWebsocketPeer(connection)
 
     def __init__(self, websocket: Connection) -> None:
         self.__websocket = websocket
@@ -60,7 +95,7 @@ class MicrobitPeer:
         # if the socket is not closed properly
         def close_socket_gracefully() -> None:
             main_thread().join()
-            self.close(1011)
+            self.close(ExitStatus.ERROR)
 
         Thread(target=close_socket_gracefully).start()
 
@@ -99,11 +134,11 @@ class MicrobitPeer:
     def stop(self) -> None:
         self.__is_listening = False
 
-    def close(self, code: int = 1000, reason: str = "") -> None:
-        self.__websocket.close(code, reason)
+    def close(self, code: ExitStatus = ExitStatus.SUCCESS, reason: str = "") -> None:
+        self.__websocket.close(1000 if code is ExitStatus.SUCCESS else 1011, reason)
         self.__websocket.close_socket()
 
-    def __enter__(self) -> MicrobitPeer:
+    def __enter__(self) -> MicrobitWebsocketPeer:
         return self
 
     def __exit__(
@@ -112,4 +147,4 @@ class MicrobitPeer:
         exc_value: Optional[BaseException],
         traceback: Optional[TracebackType],
     ) -> None:
-        self.close(1000 if exc_type is None else 1011)
+        self.close(ExitStatus.SUCCESS if exc_type is None else ExitStatus.ERROR)
