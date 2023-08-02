@@ -1,10 +1,10 @@
 from __future__ import annotations
-from microbit_protocol.exceptions import ConnectionClosed
+from microbit_protocol.exceptions import CommunicationClosed
 from microbit_protocol.commands import MicrobitCommandAdapter, MicrobitCommand
 from websockets.exceptions import (
     ConnectionClosedError,
     ConnectionClosedOK,
-    ConnectionClosed as WebsocketConnectionClosed,
+    ConnectionClosed,
 )
 from websockets.extensions.permessage_deflate import enable_server_permessage_deflate
 from websockets.sync.connection import Connection
@@ -12,12 +12,14 @@ from websockets.sync.server import ServerConnection
 from websockets.server import ServerProtocol
 from websockets.sync.client import connect
 from threading import Thread, main_thread
-from typing import Callable, Optional, Type, Protocol
+from typing import Callable, Optional, Type, Protocol, TextIO
+from typing_extensions import Self
 from pydantic import ValidationError
 from types import TracebackType
 from enum import Enum, auto
 import logging
 import socket
+import sys
 
 logger = logging.getLogger(__name__)
 
@@ -44,8 +46,8 @@ class MicrobitPeer(Protocol):
     def close(self, code: ExitStatus = ExitStatus.SUCCESS, reason: str = "") -> None:
         ...
 
-    def __enter__(self) -> MicrobitPeer:
-        ...
+    def __enter__(self) -> Self:
+        return self
 
     def __exit__(
         self,
@@ -53,7 +55,64 @@ class MicrobitPeer(Protocol):
         exc_value: Optional[BaseException],
         traceback: Optional[TracebackType],
     ) -> None:
-        ...
+        self.close(ExitStatus.SUCCESS if exc_type is None else ExitStatus.ERROR)
+
+
+class MicrobitIoPeer(MicrobitPeer):
+    def __init__(
+        self,
+        io_input: TextIO = sys.stdin,
+        io_output: TextIO = sys.stdout,
+        io_error: TextIO = sys.stderr,
+        auto_close_io: bool = False,
+    ) -> None:
+        self.__io_input = io_input
+        self.__io_output = io_output
+        self.__io_error = io_error
+        self.__auto_close_io = auto_close_io
+        self.__is_listening = False
+
+    def send_command(self, command: MicrobitCommand) -> None:
+        request = command.model_dump_json()
+
+        self.__io_output.write(f"{request}\n")
+        self.__io_output.flush()
+
+    @property
+    def is_listening(self) -> bool:
+        return self.__is_listening
+
+    def listen(self, listener: Callable[[MicrobitCommand], None]) -> None:
+        self.__is_listening = True
+
+        while self.__is_listening:
+            try:
+                response = self.__io_input.readline()[:-1]
+            except Exception as e:
+                raise CommunicationClosed() from e
+
+            try:
+                command = MicrobitCommandAdapter.validate_json(response)
+            except ValidationError as e:
+                logger.warning(f"Received invalid command: {response}")
+                continue
+
+            listener(command)
+
+    def stop(self) -> None:
+        self.__is_listening = False
+
+    def close(self, code: ExitStatus = ExitStatus.SUCCESS, reason: str = "") -> None:
+        if code is ExitStatus.ERROR:
+            self.__io_error.write("Error:\n")
+
+        self.__io_error.write(f"{reason}\n")
+        self.__io_error.flush()
+
+        if self.__auto_close_io:
+            self.__io_input.close()
+            self.__io_output.close()
+            self.__io_error.close()
 
 
 class MicrobitWebsocketPeer(MicrobitPeer):
@@ -104,8 +163,8 @@ class MicrobitWebsocketPeer(MicrobitPeer):
 
         try:
             self.__websocket.send(request)
-        except WebsocketConnectionClosed as e:
-            raise ConnectionClosed() from e
+        except ConnectionClosed as e:
+            raise CommunicationClosed() from e
 
     @property
     def is_listening(self) -> bool:
@@ -118,7 +177,7 @@ class MicrobitWebsocketPeer(MicrobitPeer):
             try:
                 response = self.__websocket.recv()
             except ConnectionClosedError as e:
-                raise ConnectionClosed() from e
+                raise CommunicationClosed() from e
             except ConnectionClosedOK:
                 self.stop()
                 break
@@ -137,14 +196,3 @@ class MicrobitWebsocketPeer(MicrobitPeer):
     def close(self, code: ExitStatus = ExitStatus.SUCCESS, reason: str = "") -> None:
         self.__websocket.close(1000 if code is ExitStatus.SUCCESS else 1011, reason)
         self.__websocket.close_socket()
-
-    def __enter__(self) -> MicrobitWebsocketPeer:
-        return self
-
-    def __exit__(
-        self,
-        exc_type: Optional[Type[BaseException]],
-        exc_value: Optional[BaseException],
-        traceback: Optional[TracebackType],
-    ) -> None:
-        self.close(ExitStatus.SUCCESS if exc_type is None else ExitStatus.ERROR)

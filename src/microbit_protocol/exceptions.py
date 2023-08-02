@@ -1,2 +1,2 @@
-class ConnectionClosed(Exception):
+class CommunicationClosed(Exception):
     pass

@@ -3,7 +3,7 @@ from microbit_protocol.commands.microbit import (
     MicrobitResetCommand,
     MicrobitTemperatureCommand,
 )
-from microbit_protocol.exceptions import ConnectionClosed
+from microbit_protocol.exceptions import CommunicationClosed
 from microbit_protocol.commands import MicrobitCommand
 from microbit_protocol.peer import MicrobitPeer
 from _thread import interrupt_main
@@ -53,7 +53,7 @@ class Microbit:
         def target() -> None:
             try:
                 self.__peer.listen(listener)
-            except ConnectionClosed:
+            except CommunicationClosed:
                 logger.warning("Connection closed unexpectedly")
             interrupt_main()
 
