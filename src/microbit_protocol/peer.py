@@ -154,7 +154,7 @@ class MicrobitWebsocketPeer(MicrobitPeer):
         # if the socket is not closed properly
         def close_socket_gracefully() -> None:
             main_thread().join()
-            self.close(ExitStatus.ERROR)
+            self.close(ExitStatus.SUCCESS)
 
         Thread(target=close_socket_gracefully).start()
 
