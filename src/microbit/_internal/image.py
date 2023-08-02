@@ -244,12 +244,12 @@ class Image:
         Args:
             x (int): The x position of the pixel
             y (int): The y position of the pixel
-            value (int): The brightness of the pixel
+            value (int): The brightness of the pixel, from 0 (dark) to 9 (bright)
 
         Raises:
             TypeError: if the image is read-only
             ValueError: if the brightness is out of range
-            ValueError: if the x or y position is out of range
+            ValueError: if x or y is out of the image
         """
         assert isinstance(x, int), f"x must be an int, not {type(x).__name__}"
         assert isinstance(y, int), f"y must be an int, not {type(y).__name__}"
@@ -276,6 +276,9 @@ class Image:
 
         Raises:
             ValueError: if x or y is out of the image
+
+        Returns:
+            int: The brightness of the pixel, from 0 (dark) to 9 (bright)
         """
         assert isinstance(x, int), f"x must be an int, not {type(x).__name__}"
         assert isinstance(y, int), f"y must be an int, not {type(y).__name__}"
@@ -609,7 +612,7 @@ class Image:
         "+": "00000:00900:09990:00900:00000",
         ",": "00000:00000:00000:00900:09000",
         "-": "00000:00000:09990:00000:00000",
-        ".": "00000:00000:00000:00900:09000",
+        ".": "00000:00000:00000:00900:00900",
         "/": "00009:00090:00900:09000:90000",
         "0": "09900:90090:90090:90090:09900",
         "1": "00900:09900:00900:00900:09990",
