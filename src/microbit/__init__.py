@@ -3,7 +3,7 @@ from .MicrobitSimulatorThread import (
 )
 from typing import Union
 from microbit._internal import microbit as __microbit
-from microbit.image import Image
+from microbit._internal.microbit.image import Image
 
 class _MicroBitDigitalPin:
     """Digital pin on the Micro:Bit board"""

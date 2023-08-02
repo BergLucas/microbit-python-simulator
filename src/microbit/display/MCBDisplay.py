@@ -2,7 +2,7 @@ from threading import Thread
 from time import sleep
 from typing import Type, Union, Iterable
 from .Display import Display
-from ..image.Image import Image
+from microbit._internal.microbit.image import Image
 
 
 class MCBDisplay(Display):

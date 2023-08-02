@@ -1,5 +1,5 @@
 from typing import Union, Iterable
-from ..image.Image import Image
+from microbit._internal.microbit.image import Image
 
 
 class Display:
