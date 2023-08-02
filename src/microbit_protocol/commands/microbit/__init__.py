@@ -24,3 +24,9 @@ class MicrobitSleepCommand(BaseModel):
 class MicrobitTemperatureCommand(BaseModel):
     command: Literal["microbit.temperature"] = "microbit.temperature"
     temperature: int = Field(..., ge=0, le=255)
+
+
+class MicrobitButtonIsPressedCommand(BaseModel):
+    command: Literal["microbit.Button.is_pressed"] = "microbit.Button.is_pressed"
+    instance: Literal["button_a", "button_b"]
+    is_pressed: bool

@@ -7,6 +7,7 @@ from microbit_protocol.commands.microbit import (
     MicrobitRunningTimeCommand,
     MicrobitSleepCommand,
     MicrobitTemperatureCommand,
+    MicrobitButtonIsPressedCommand,
 )
 
 MicrobitCommand = Union[
@@ -15,6 +16,7 @@ MicrobitCommand = Union[
     MicrobitRunningTimeCommand,
     MicrobitSleepCommand,
     MicrobitTemperatureCommand,
+    MicrobitButtonIsPressedCommand,
 ]
 
 MicrobitCommandAdapter = TypeAdapter(MicrobitCommand)

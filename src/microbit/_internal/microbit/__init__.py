@@ -2,13 +2,15 @@ from microbit_protocol.commands.microbit import (
     MicrobitPanicCommand,
     MicrobitResetCommand,
     MicrobitTemperatureCommand,
+    MicrobitButtonIsPressedCommand,
 )
 from microbit_protocol.exceptions import CommunicationClosed
 from microbit_protocol.commands import MicrobitCommand
 from microbit_protocol.peer import MicrobitPeer
+from microbit._internal.microbit.button import MicrobitButton, Button
 from _thread import interrupt_main
+from typing import Union, Protocol
 from threading import Thread
-from typing import Union
 import logging
 import time
 
@@ -21,6 +23,16 @@ class Microbit:
         self.__peer = peer
         self.__temperature = 0
         self.__thread = None
+        self.__button_a = MicrobitButton()
+        self.__button_b = MicrobitButton()
+
+    @property
+    def button_a(self) -> Button:
+        return self.__button_a
+
+    @property
+    def button_b(self) -> Button:
+        return self.__button_b
 
     def panic(self, n: int) -> None:
         self.__peer.send_command(MicrobitPanicCommand(n=n))
@@ -40,8 +52,15 @@ class Microbit:
     def execute(self, command: MicrobitCommand) -> None:
         if isinstance(command, MicrobitTemperatureCommand):
             self.__temperature = command.temperature
-        else:
-            raise ValueError(f"Unknown command: {command}")
+        if isinstance(command, MicrobitButtonIsPressedCommand):
+            if command.instance == "button_a":
+                self.__button_a.execute(command)
+            elif command.instance == "button_b":
+                self.__button_b.execute(command)
+            else:
+                raise ValueError(f"Unknown button instance: {command.instance}")
+
+        raise ValueError(f"Unknown command: {command}")
 
     def start(self) -> None:
         def listener(command: MicrobitCommand) -> None:
