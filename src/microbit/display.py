@@ -15,7 +15,7 @@ def get_pixel(x: int, y: int) -> int:
     Returns:
         int: The brightness of the pixel, from 0 (dark) to 9 (bright)
     """
-    return _internal.microbit.display.get_pixel(x, y)
+    return _internal.display.get_pixel(x, y)
 
 
 def set_pixel(x: int, y: int, value: int) -> None:
@@ -30,12 +30,12 @@ def set_pixel(x: int, y: int, value: int) -> None:
         ValueError: if the brightness is out of range
         ValueError: if x or y is out of the screen
     """
-    _internal.microbit.display.set_pixel(x, y, value)
+    _internal.display.set_pixel(x, y, value)
 
 
 def clear() -> None:
     """Set the brightness of all LEDs to 0 (off)."""
-    _internal.microbit.display.clear()
+    _internal.display.clear()
 
 
 @overload
@@ -100,7 +100,7 @@ def show(
     Raises:
         ValueError: if `delay` is negative
     """
-    _internal.microbit.display.show(image, delay, wait=wait, loop=loop, clear=clear)
+    _internal.display.show(image, delay, wait=wait, loop=loop, clear=clear)
 
 
 def scroll(
@@ -132,19 +132,17 @@ def scroll(
     Raises:
         ValueError: if `delay` is negative
     """
-    _internal.microbit.display.scroll(
-        text, delay, wait=wait, loop=loop, monospace=monospace
-    )
+    _internal.display.scroll(text, delay, wait=wait, loop=loop, monospace=monospace)
 
 
 def on() -> None:
     """Use on() to turn on the display."""
-    _internal.microbit.display.on()
+    _internal.display.on()
 
 
 def off() -> None:
     """Use off() to turn off the display (thus allowing you to re-use the GPIO pins associated with the display for other purposes)."""
-    _internal.microbit.display.off()
+    _internal.display.off()
 
 
 def is_on() -> bool:
@@ -153,7 +151,7 @@ def is_on() -> bool:
     Returns:
         bool: Whether the display is on
     """
-    return _internal.microbit.display.is_on()
+    return _internal.display.is_on()
 
 
 def read_light_level() -> int:
@@ -163,4 +161,4 @@ def read_light_level() -> int:
     Returns:
         int: The light level, between 0 and 255
     """
-    return _internal.microbit.display.read_light_level()
+    return _internal.display.read_light_level()

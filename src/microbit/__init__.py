@@ -1,7 +1,7 @@
-from typing import Union
-from microbit._internal import microbit as __microbit
-from microbit._internal.image import Image
+from microbit._internal import microbit as __microbit, button_a, button_b
+from microbit_client.image import Image
 from microbit import display
+from typing import Union
 
 
 class _MicroBitDigitalPin:
@@ -175,9 +175,6 @@ class _compass:
         """Returns an integer indication of the magnitude of the magnetic field around the device in nano tesla."""
         return 0
 
-
-button_a = __microbit.button_a
-button_b = __microbit.button_b
 
 spi = _spi()
 uart = _uart()

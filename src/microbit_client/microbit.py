@@ -8,8 +8,8 @@ from microbit_protocol.commands import MicrobitDisplayModuleCommand
 from microbit_protocol.exceptions import CommunicationClosed
 from microbit_protocol.commands import MicrobitCommand
 from microbit_protocol.peer import MicrobitPeer
-from microbit._internal.button import MicrobitButton, Button
-from microbit._internal.display import Display
+from microbit_client.button import MicrobitButton, Button
+from microbit_client.display import Display
 from _thread import interrupt_main
 from typing import Union, get_args
 from threading import Thread

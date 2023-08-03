@@ -8,7 +8,7 @@ from microbit_protocol.commands.microbit.display import (
 )
 from microbit_protocol.commands import MicrobitCommand
 from microbit_protocol.peer import MicrobitPeer
-from microbit._internal.image import Image
+from microbit_client.image import Image
 from typing import Union, Iterable, overload
 from threading import Thread
 from time import sleep
