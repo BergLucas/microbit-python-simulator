@@ -21,6 +21,12 @@ class Display:
         self.on()
         self.clear()
 
+        def listener(command: MicrobitCommand) -> None:
+            if isinstance(command, MicrobitDisplayReadLightLevelCommand):
+                self.__light_level = command.light_level
+
+        peer.add_listener(listener)
+
     def get_pixel(self, x: int, y: int) -> int:
         assert isinstance(x, int), f"x must be an int, not {type(x).__name__}"
         assert isinstance(y, int), f"y must be an int, not {type(y).__name__}"
@@ -156,12 +162,6 @@ class Display:
 
     def read_light_level(self) -> int:
         return self.__light_level
-
-    def execute(self, command: MicrobitCommand) -> None:
-        if isinstance(command, MicrobitDisplayReadLightLevelCommand):
-            self.__light_level = command.light_level
-        else:
-            raise ValueError(f"Unknown command: {command}")
 
     def __scroll_image(self, image: Image, delay: int) -> None:
         for i in range(image.width() + 1):

@@ -1,6 +1,10 @@
 from microbit_protocol.commands.microbit import MicrobitButtonIsPressedCommand
 from microbit_protocol.commands import MicrobitCommand
-from typing import Protocol
+from microbit_protocol.peer import MicrobitPeer
+from typing import Protocol, Literal
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class Button(Protocol):
@@ -38,19 +42,24 @@ class Button(Protocol):
 
 
 class MicrobitButton(Button):
-    def __init__(self) -> None:
+    def __init__(
+        self, peer: MicrobitPeer, instance: Literal["button_a", "button_b"]
+    ) -> None:
         self.__is_pressed = False
         self.__was_pressed = False
         self.__get_presses = 0
 
-    def execute(self, command: MicrobitCommand) -> None:
-        if isinstance(command, MicrobitButtonIsPressedCommand):
-            if not self.__is_pressed and command.is_pressed:
-                self.__was_pressed = True
-                self.__get_presses += 1
-            self.__is_pressed = command.is_pressed
-        else:
-            raise ValueError(f"Unknown command: {command}")
+        def listener(command: MicrobitCommand) -> None:
+            if (
+                isinstance(command, MicrobitButtonIsPressedCommand)
+                and command.instance == instance
+            ):
+                if not self.__is_pressed and command.is_pressed:
+                    self.__was_pressed = True
+                    self.__get_presses += 1
+                self.__is_pressed = command.is_pressed
+
+        peer.add_listener(listener)
 
     def is_pressed(self) -> bool:
         return self.__is_pressed
