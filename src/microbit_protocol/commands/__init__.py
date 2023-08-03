@@ -1,22 +1,13 @@
 from pydantic.type_adapter import TypeAdapter
 from typing import Union
 
-from microbit_protocol.commands.microbit import (
-    MicrobitPanicCommand,
-    MicrobitResetCommand,
-    MicrobitRunningTimeCommand,
-    MicrobitSleepCommand,
-    MicrobitTemperatureCommand,
-    MicrobitButtonIsPressedCommand,
-)
+from microbit_protocol.commands.microbit.display import MicrobitDisplayModuleCommand
+from microbit_protocol.commands.microbit import MicrobitModuleCommand
+
 
 MicrobitCommand = Union[
-    MicrobitPanicCommand,
-    MicrobitResetCommand,
-    MicrobitRunningTimeCommand,
-    MicrobitSleepCommand,
-    MicrobitTemperatureCommand,
-    MicrobitButtonIsPressedCommand,
+    MicrobitModuleCommand,
+    MicrobitDisplayModuleCommand,
 ]
 
 MicrobitCommandAdapter = TypeAdapter(MicrobitCommand)

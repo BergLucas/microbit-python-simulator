@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Literal
+from typing import Literal, Union
 
 
 class MicrobitPanicCommand(BaseModel):
@@ -30,3 +30,13 @@ class MicrobitButtonIsPressedCommand(BaseModel):
     command: Literal["microbit.Button.is_pressed"] = "microbit.Button.is_pressed"
     instance: Literal["button_a", "button_b"]
     is_pressed: bool
+
+
+MicrobitModuleCommand = Union[
+    MicrobitPanicCommand,
+    MicrobitResetCommand,
+    MicrobitRunningTimeCommand,
+    MicrobitSleepCommand,
+    MicrobitTemperatureCommand,
+    MicrobitButtonIsPressedCommand,
+]
