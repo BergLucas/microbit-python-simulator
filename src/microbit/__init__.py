@@ -1,108 +1,36 @@
-from microbit._internal import microbit as __microbit, button_a, button_b
+from microbit._internal import (
+    microbit as __microbit,
+    button_a,
+    button_b,
+    pin0,
+    pin1,
+    pin2,
+    pin3,
+    pin4,
+    pin5,
+    pin6,
+    pin7,
+    pin8,
+    pin9,
+    pin10,
+    pin11,
+    pin12,
+    pin13,
+    pin14,
+    pin15,
+    pin16,
+    pin19,
+    pin20,
+)
 from microbit_client.image import Image
-from microbit import display
+from microbit import display, spi
 from typing import Union
 
 
-class _MicroBitDigitalPin:
-    """Digital pin on the Micro:Bit board"""
-
-    def read_digital(self):
-        """Return 1 if the pin is high, and 0 if it's low"""
-        return 1
-
-    def write_digital(self, value):
-        """Set the pin to High if the value is 1, or else set it to 0"""
-        a = value
-
-    def __init__(self):
-        a = 0
-
-
-class _MicroBitAnalogDigitalPin:
-    """Analog (PWM) pin on the Micro:Bit board"""
-
-    def read_analog(self):
-        """Reads the voltage applied to the pin, and return it as an integer between 0 (0V), and 1024 (3.3V)"""
-        return 1023
-
-    def write_analog(self, value):
-        """Output a PWM signal on the pin, with a duty cycle proportional to provided value, where 0 = 0%, and 1023 = 100%"""
-        a = value
-
-    def set_analog_period(self, period):
-        """Set the period of the PWM signal being output to period in ms. Minimum valid is 1ms"""
-        a = period
-
-    def set_analog_period_microseconds(self, period):
-        """Set the period of the PWM signal being output to period in microseconds. Minimum valid is 256"""
-        a = period
-
-    def __init__(self):
-        a = 0
-
-
-class _MicroBitTouchPin:
-    """Touch sensitive pin on the Micro:Bit board"""
-
-    def is_touched(self):
-        """Return True if the pin is being touched, otherwise False"""
-        return True
-
-    def __init__(self):
-        a = 0
-
-
-class _MicroBitAnalogDigitalPinReadOnly:
-    """Read only PWM pin"""
-
-    def read_analog(self):
-        """Reads the voltage applied to the pin, and return it as an integer between 0 (0V), and 1024 (3.3V)"""
-        return 1023
-
-    def __init__(self):
-        a = 0
-
-
-pin0 = _MicroBitTouchPin()
-pin1 = _MicroBitTouchPin()
-pin2 = _MicroBitTouchPin()
-pin3 = _MicroBitAnalogDigitalPin()
-pin4 = _MicroBitAnalogDigitalPin()
-pin5 = _MicroBitDigitalPin()
-pin6 = _MicroBitDigitalPin()
-pin7 = _MicroBitDigitalPin()
-pin8 = _MicroBitDigitalPin()
-pin9 = _MicroBitDigitalPin()
-pin10 = _MicroBitAnalogDigitalPin()
-pin11 = _MicroBitDigitalPin()
-pin12 = _MicroBitAnalogDigitalPin()
-pin13 = _MicroBitDigitalPin()
-pin14 = _MicroBitDigitalPin()
-pin15 = _MicroBitDigitalPin()
-pin16 = _MicroBitDigitalPin()
-pin19 = _MicroBitDigitalPin()
-pin20 = _MicroBitDigitalPin()
-
-
-class _spi:
-    def init(
-        self, baudrate=1000000, bits=8, mode=0, sclk=pin13, mosi=pin15, miso=pin14
-    ):
-        """see: https://microbit-micropython.readthedocs.io/en/latest/spi.html"""
-
-    def read(self, nbytes):
-        """Read at most nbytes. Returns what was read."""
-
-    def write(self, buffer):
-        """Write the buffer of bytes to the bus."""
-
-    def write_readinto(self, out, inBuffer):
-        """Write the out buffer to the bus and read any response into the in buffer. The length of the buffers should be the same. The buffers can be the same object."""
-
-
 class _uart:
-    def init(self, baudrate=9600, bits=8, parity=None, stop=1, *, tx=None, rx=None):
+    def init(
+        self, baudrate=9600, bits=8, parity=None, stop=1, *, tx=None, rx=None
+    ) -> None:
         """Initialize serial communication with the specified parameters on the specified tx and rx pins. Note that for correct communication, the parameters have to be the same on both communicating devices."""
 
     def any(self):
@@ -176,7 +104,6 @@ class _compass:
         return 0
 
 
-spi = _spi()
 uart = _uart()
 i2c = _i2c()
 compass = _compass()
