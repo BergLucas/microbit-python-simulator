@@ -79,8 +79,9 @@ class Microbit:
                 logger.warning(e)
 
         def target() -> None:
+            self.__peer.add_listener(listener)
             try:
-                self.__peer.listen(listener)
+                self.__peer.listen()
             except CommunicationClosed:
                 logger.warning("Connection closed unexpectedly")
             interrupt_main()

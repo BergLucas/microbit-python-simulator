@@ -33,11 +33,21 @@ class MicrobitPeer(Protocol):
     def send_command(self, command: MicrobitCommand) -> None:
         ...
 
+    def add_listener(self, listener: Callable[[MicrobitCommand], None]) -> None:
+        ...
+
+    def remove_listener(self, listener: Callable[[MicrobitCommand], None]) -> None:
+        ...
+
+    @property
+    def listeners(self) -> set[Callable[[MicrobitCommand], None]]:
+        ...
+
     @property
     def is_listening(self) -> bool:
         ...
 
-    def listen(self, listener: Callable[[MicrobitCommand], None]) -> None:
+    def listen(self) -> None:
         ...
 
     def stop(self) -> None:
@@ -70,6 +80,7 @@ class MicrobitIoPeer(MicrobitPeer):
         self.__io_output = io_output
         self.__io_error = io_error
         self.__auto_close_io = auto_close_io
+        self.__listeners: set[Callable[[MicrobitCommand], None]] = set()
         self.__is_listening = False
 
     def send_command(self, command: MicrobitCommand) -> None:
@@ -78,11 +89,21 @@ class MicrobitIoPeer(MicrobitPeer):
         self.__io_output.write(f"{request}\n")
         self.__io_output.flush()
 
+    def add_listener(self, listener: Callable[[MicrobitCommand], None]) -> None:
+        self.__listeners.add(listener)
+
+    def remove_listener(self, listener: Callable[[MicrobitCommand], None]) -> None:
+        self.__listeners.remove(listener)
+
+    @property
+    def listeners(self) -> set[Callable[[MicrobitCommand], None]]:
+        return self.__listeners.copy()
+
     @property
     def is_listening(self) -> bool:
         return self.__is_listening
 
-    def listen(self, listener: Callable[[MicrobitCommand], None]) -> None:
+    def listen(self) -> None:
         self.__is_listening = True
 
         while self.__is_listening:
@@ -97,7 +118,8 @@ class MicrobitIoPeer(MicrobitPeer):
                 logger.warning(f"Received invalid command: {response}")
                 continue
 
-            listener(command)
+            for listener in self.__listeners:
+                listener(command)
 
     def stop(self) -> None:
         self.__is_listening = False
@@ -147,6 +169,7 @@ class MicrobitWebsocketPeer(MicrobitPeer):
 
     def __init__(self, websocket: Connection) -> None:
         self.__websocket = websocket
+        self.__listeners: set[Callable[[MicrobitCommand], None]] = set()
         self.__is_listening = False
 
         # Temporary fix because websockets create a non-daemon thread
@@ -166,11 +189,21 @@ class MicrobitWebsocketPeer(MicrobitPeer):
         except ConnectionClosed as e:
             raise CommunicationClosed() from e
 
+    def add_listener(self, listener: Callable[[MicrobitCommand], None]) -> None:
+        self.__listeners.add(listener)
+
+    def remove_listener(self, listener: Callable[[MicrobitCommand], None]) -> None:
+        self.__listeners.remove(listener)
+
+    @property
+    def listeners(self) -> set[Callable[[MicrobitCommand], None]]:
+        return self.__listeners.copy()
+
     @property
     def is_listening(self) -> bool:
         return self.__is_listening
 
-    def listen(self, listener: Callable[[MicrobitCommand], None]) -> None:
+    def listen(self) -> None:
         self.__is_listening = True
 
         while self.__is_listening:
@@ -188,7 +221,8 @@ class MicrobitWebsocketPeer(MicrobitPeer):
                 logger.warning(f"Received invalid command: {response}")
                 continue
 
-            listener(command)
+            for listener in self.__listeners:
+                listener(command)
 
     def stop(self) -> None:
         self.__is_listening = False
