@@ -49,8 +49,8 @@ class MicrobitButton(Button):
                 self.__was_pressed = True
                 self.__get_presses += 1
             self.__is_pressed = command.is_pressed
-
-        raise ValueError(f"Unknown command: {command}")
+        else:
+            raise ValueError(f"Unknown command: {command}")
 
     def is_pressed(self) -> bool:
         return self.__is_pressed
