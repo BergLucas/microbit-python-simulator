@@ -27,7 +27,9 @@ class MicrobitDisplayOffCommand(BaseModel):
 
 
 class MicrobitDisplayReadLightLevelCommand(BaseModel):
-    command: Literal["microbit.display.read_light_level"] = "microbit.display.read_light_level"
+    command: Literal[
+        "microbit.display.read_light_level"
+    ] = "microbit.display.read_light_level"
     light_level: int = Field(..., ge=0, le=255)
 
 

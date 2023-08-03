@@ -13,6 +13,7 @@ from typing import Union, Iterable, overload
 from threading import Thread
 from time import sleep
 
+
 class Display:
     def __init__(self, peer: MicrobitPeer) -> None:
         self.__peer = peer
@@ -74,42 +75,17 @@ class Display:
         self.__pixels = [[0 for _ in range(5)] for _ in range(5)]
         self.__peer.send_command(MicrobitDisplayClearCommand())
 
-    @overload
-    def show(self, image: Image) -> None:
+    def show(
+        self,
+        image: Union[Image, str, float, int, Iterable[Image]],
+        delay: int = 400,
+        *,
+        wait: bool = True,
+        loop: bool = False,
+        clear: bool = False,
+    ) -> None:
         """Display the `image`.
 
-        Args:
-            image (Image): The image to display
-        """
-
-    @overload
-    def show(self, image: Union[str, float, int, Iterable[Image]], delay: int = 400, *, wait: bool = True, loop: bool = False, clear: bool = False) -> None:
-        """If `image` is a string, float or integer, display letters/digits in sequence.
-        Otherwise, if `image` is an iterable sequence of images, display these images in sequence.
-        Each letter, digit or image is shown with `delay` milliseconds between them.
-
-        If `wait` is `True`, this function will block until the animation is finished, otherwise the animation will happen in the background.
-
-        If `loop` is `True`, the animation will repeat forever.
-
-        If `clear` is `True`, the display will be cleared after the iterable has finished.
-
-        Note that the `wait`, `loop` and `clear` arguments must be specified using their keyword.
-
-        Args:
-            image (Union[str, float, int, Iterable[Image]]): The image or images to display
-            delay (int, optional): The delay between images in milliseconds. Defaults to 400.
-            wait (bool, optional): Whether to wait until the animation is finished. Defaults to True.
-            loop (bool, optional): Whether to loop the animation. Defaults to False.
-            clear (bool, optional): Whether to clear the display after the animation. Defaults to False.
-
-        Raises:
-            ValueError: if `delay` is negative
-        """
-
-    def show(self, image: Union[Image, str, float, int, Iterable[Image]], delay: int = 400, *, wait: bool = True, loop: bool = False, clear: bool = False) -> None:
-        """Display the `image`.
-        
         Args:
             image (Union[Image, str, float, int, Iterable[Image]]): The image or images to display
             delay (int, optional): The delay between images in milliseconds. Defaults to 400.
@@ -124,11 +100,17 @@ class Display:
             self.__send_image(image)
             return
 
-        assert isinstance(image, (str, float, int, Iterable)), f"image must be a str, float, int or Iterable[Image], got {type(image).__name__}"
-        assert isinstance(delay, int), f"delay must be an int, not {type(delay).__name__}"
+        assert isinstance(
+            image, (str, float, int, Iterable)
+        ), f"image must be a str, float, int or Iterable[Image], got {type(image).__name__}"
+        assert isinstance(
+            delay, int
+        ), f"delay must be an int, not {type(delay).__name__}"
         assert isinstance(wait, bool), f"wait must be a bool, not {type(wait).__name__}"
         assert isinstance(loop, bool), f"loop must be a bool, not {type(loop).__name__}"
-        assert isinstance(clear, bool), f"clear must be a bool, not {type(clear).__name__}"
+        assert isinstance(
+            clear, bool
+        ), f"clear must be a bool, not {type(clear).__name__}"
 
         if delay < 0:
             raise ValueError("delay must be positive")
@@ -154,7 +136,15 @@ class Display:
         if clear:
             self.clear()
 
-    def scroll(self, text: Union[str, int, float], delay: int = 150, *, wait: bool = True, loop: bool = False, monospace: bool = False) -> None:
+    def scroll(
+        self,
+        text: Union[str, int, float],
+        delay: int = 150,
+        *,
+        wait: bool = True,
+        loop: bool = False,
+        monospace: bool = False,
+    ) -> None:
         """Scrolls `text` horizontally on the display. If `text` is an integer or float it is first converted to a string using `str()`.
         The `delay` parameter controls how fast the text is scrolling.
 
@@ -176,11 +166,17 @@ class Display:
         Raises:
             ValueError: if `delay` is negative
         """
-        assert isinstance(text, (str, int, float)), f"text must be a str, int or float, not {type(text).__name__}"
-        assert isinstance(delay, int), f"delay must be an int, not {type(delay).__name__}"
+        assert isinstance(
+            text, (str, int, float)
+        ), f"text must be a str, int or float, not {type(text).__name__}"
+        assert isinstance(
+            delay, int
+        ), f"delay must be an int, not {type(delay).__name__}"
         assert isinstance(wait, bool), f"wait must be a bool, not {type(wait).__name__}"
         assert isinstance(loop, bool), f"loop must be a bool, not {type(loop).__name__}"
-        assert isinstance(monospace, bool), f"monospace must be a bool, not {type(monospace).__name__}"
+        assert isinstance(
+            monospace, bool
+        ), f"monospace must be a bool, not {type(monospace).__name__}"
 
         if delay < 0:
             raise ValueError("delay must be positive")
@@ -188,10 +184,10 @@ class Display:
         if isinstance(text, (int, float)):
             text = str(text)
 
-        image = Image(4 + 5*len(text), 5)
+        image = Image(4 + 5 * len(text), 5)
 
         for i, char in enumerate(text):
-            image.blit(Image(char), 0, 0, 5, 5, 4 + 5*i, 0)
+            image.blit(Image(char), 0, 0, 5, 5, 4 + 5 * i, 0)
 
         def target() -> None:
             self.__scroll_image(image, delay)
@@ -215,7 +211,7 @@ class Display:
 
     def is_on(self) -> bool:
         """Returns `True` if the display is `on`, otherwise returns `False`.
-        
+
         Returns:
             bool: Whether the display is on
         """
@@ -235,7 +231,7 @@ class Display:
 
         Args:
             command (MicrobitCommand): The command to execute
-        
+
         Raises:
             ValueError: if the command is not recognised
         """
@@ -253,7 +249,7 @@ class Display:
         """
         for i in range(image.width() + 1):
             self.__send_image(image.crop(i, 0, 5, 5))
-            sleep(delay/1000)
+            sleep(delay / 1000)
 
     def __send_images(self, images: Iterable[Image], delay: int) -> None:
         """Send the images with a delay between them.
@@ -264,7 +260,7 @@ class Display:
         """
         for image in images:
             self.__send_image(image)
-            sleep(delay/1000)
+            sleep(delay / 1000)
 
     def __send_image(self, image: Image) -> None:
         """Send the image.

@@ -1,6 +1,7 @@
 from typing import Union
 from microbit._internal import microbit as __microbit
 from microbit._internal.image import Image
+from microbit import display
 
 
 class _MicroBitDigitalPin:
