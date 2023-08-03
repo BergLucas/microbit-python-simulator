@@ -4,12 +4,14 @@ from microbit_protocol.commands.microbit import (
     MicrobitTemperatureCommand,
     MicrobitButtonIsPressedCommand,
 )
+from microbit_protocol.commands import MicrobitDisplayModuleCommand
 from microbit_protocol.exceptions import CommunicationClosed
 from microbit_protocol.commands import MicrobitCommand
 from microbit_protocol.peer import MicrobitPeer
 from microbit._internal.button import MicrobitButton, Button
+from microbit._internal.display import Display
 from _thread import interrupt_main
-from typing import Union
+from typing import Union, get_args
 from threading import Thread
 import logging
 import time
@@ -25,6 +27,7 @@ class Microbit:
         self.__thread = None
         self.__button_a = MicrobitButton()
         self.__button_b = MicrobitButton()
+        self.__display = Display(peer)
 
     @property
     def button_a(self) -> Button:
@@ -33,6 +36,10 @@ class Microbit:
     @property
     def button_b(self) -> Button:
         return self.__button_b
+
+    @property
+    def display(self) -> Display:
+        return self.__display
 
     def panic(self, n: int) -> None:
         self.__peer.send_command(MicrobitPanicCommand(n=n))
@@ -52,15 +59,17 @@ class Microbit:
     def execute(self, command: MicrobitCommand) -> None:
         if isinstance(command, MicrobitTemperatureCommand):
             self.__temperature = command.temperature
-        if isinstance(command, MicrobitButtonIsPressedCommand):
+        elif isinstance(command, MicrobitButtonIsPressedCommand):
             if command.instance == "button_a":
                 self.__button_a.execute(command)
             elif command.instance == "button_b":
                 self.__button_b.execute(command)
             else:
                 raise ValueError(f"Unknown button instance: {command.instance}")
-
-        raise ValueError(f"Unknown command: {command}")
+        elif isinstance(command, get_args(MicrobitDisplayModuleCommand)):
+            self.__display.execute(command)
+        else:
+            raise ValueError(f"Unknown command: {command}")
 
     def start(self) -> None:
         def listener(command: MicrobitCommand) -> None:
