@@ -454,7 +454,10 @@ class Image:
             for dy in range(max(0, ydest), min(ydest + h, self.__height)):
                 sx = dx - (xdest - x)
                 sy = dy - (ydest - y)
-                value = src.__pixels[sy][sx]
+                try:
+                    value = src.__pixels[sy][sx]
+                except IndexError:
+                    value = 0
                 self.__pixels[dy][dx] = value
 
     def __merge_with_image(
