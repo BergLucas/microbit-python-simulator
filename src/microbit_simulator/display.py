@@ -2,11 +2,11 @@ from microbit_client.image import Image
 from tkinter import Frame, Canvas, Widget
 from typing import Union, Iterable
 from threading import Thread
-from ..utils import rgb
+from .utils import rgb
 from time import sleep
 
 
-class MCBDisplayRenderer(Frame):
+class DisplayWidget(Frame):
     def __init__(self, master: Widget, size: int):
         """Create a MicrobitDisplayRenderer object
 

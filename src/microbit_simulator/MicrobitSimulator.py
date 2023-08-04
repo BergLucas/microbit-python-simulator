@@ -2,7 +2,7 @@ import time
 from .utils import rgb
 from .Settings import *
 from .button import ButtonWidget
-from .display.MCBDisplayRenderer import MCBDisplayRenderer
+from .display import DisplayWidget
 from .accelerometer import AccelerometerWidget
 from tkinter import Tk, Canvas
 
@@ -32,7 +32,7 @@ class MicrobitSimulator(Tk):
         x_space = 0.4
         size = width * x_space
         y_space = size / height
-        self.__display = MCBDisplayRenderer(self.__background, int(size))
+        self.__display = DisplayWidget(self.__background, int(size))
         self.__display.place(relx=(1 - x_space) / 2, rely=(1 - y_space) / 2)
         # Setup buttons
         self.__buttons = {}
@@ -57,12 +57,12 @@ class MicrobitSimulator(Tk):
         self.__display.shutdown()
         super().quit()
 
-    def getDisplay(self) -> MCBDisplayRenderer:
+    def getDisplay(self) -> DisplayWidget:
         """Get the display object of the MicrobitSimulator
 
         Returns:
         --------
-        display : The display of the MicrobitSimulator (MCBDisplayRenderer)
+        display : The display of the MicrobitSimulator (DisplayWidget)
         """
         return self.__display
 
@@ -71,7 +71,7 @@ class MicrobitSimulator(Tk):
 
         Returns:
         --------
-        accelerometer : The accelerometer of the MicrobitSimulator (MCBDisplayRenderer)
+        accelerometer : The accelerometer of the MicrobitSimulator (DisplayWidget)
         """
         return self.__accelerometer
 
