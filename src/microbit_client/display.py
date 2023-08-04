@@ -31,10 +31,10 @@ class Display:
         assert isinstance(x, int), f"x must be an int, not {type(x).__name__}"
         assert isinstance(y, int), f"y must be an int, not {type(y).__name__}"
 
-        try:
-            return self.__pixels[y][x]
-        except IndexError:
+        if x < 0 or 4 < x or y < 0 or 4 < y:
             raise ValueError(f"invalid position {x}, {y}")
+
+        return self.__pixels[y][x]
 
     def set_pixel(self, x: int, y: int, value: int) -> None:
         assert isinstance(x, int), f"x must be an int, not {type(x).__name__}"
@@ -46,10 +46,10 @@ class Display:
         if value < 0 or 9 < value:
             raise ValueError("brightness out of bounds")
 
-        try:
-            self.__pixels[y][x] = value
-        except IndexError:
+        if x < 0 or 4 < x or y < 0 or 4 < y:
             raise ValueError(f"invalid position {x}, {y}")
+
+        self.__pixels[y][x] = value
 
         self.__peer.send_command(MicrobitDisplaySetPixelCommand(x=x, y=y, value=value))
 

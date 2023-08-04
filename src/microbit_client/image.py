@@ -262,10 +262,10 @@ class Image:
         if value < 0 or 9 < value:
             raise ValueError("brightness out of bounds")
 
-        try:
-            self.__pixels[y][x] = value
-        except IndexError:
-            raise ValueError("invalid position {x}, {y}")
+        if x < 0 or x >= self.__width or y < 0 or y >= self.__height:
+            raise ValueError(f"invalid position {x}, {y}")
+
+        self.__pixels[y][x] = value
 
     def get_pixel(self, x: int, y: int) -> int:
         """Return the brightness of pixel at column `x` and row `y` as an integer between 0 and 9.
@@ -283,10 +283,10 @@ class Image:
         assert isinstance(x, int), f"x must be an int, not {type(x).__name__}"
         assert isinstance(y, int), f"y must be an int, not {type(y).__name__}"
 
-        try:
-            return self.__pixels[y][x]
-        except IndexError:
+        if x < 0 or x >= self.__width or y < 0 or y >= self.__height:
             raise ValueError(f"invalid position {x}, {y}")
+
+        return self.__pixels[y][x]
 
     def shift_left(self, n: int) -> Image:
         """Return a new image created by shifting the picture left by n columns.
