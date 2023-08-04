@@ -51,9 +51,9 @@ class Microbit:
         result = (value - from_min) / from_ratio * to_ratio + to_min
 
         if isinstance(to_min, float) or isinstance(to_max, float):
-            return round(result)
-        else:
             return result
+        else:
+            return round(result)
 
     def temperature(self) -> int:
         return self.__temperature
