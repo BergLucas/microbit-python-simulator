@@ -22,47 +22,10 @@ from microbit._internal import (
     pin19,
     pin20,
 )
-from microbit import display, spi, uart, ic2
+from microbit import display, spi, uart, ic2, compass
 from microbit_client.image import Image
 import time, time as utime
 from typing import Union
-
-
-class _compass:
-    def calibrate(self):
-        """Starts the calibration process. An instructive message will be scrolled to the user after which they will need to rotate the device in order to draw a circle on the LED display."""
-
-    def is_calibrated(self):
-        """Returns True if the compass has been successfully calibrated, and returns False otherwise."""
-        return True
-
-    def clear_calibration(self):
-        """Undoes the calibration, making the compass uncalibrated again."""
-
-    def get_x(self):
-        """Gives the reading of the magnetic field strength on the x axis in nano tesla, as a positive or negative integer, depending on the direction of the field."""
-        return 0
-
-    def get_y(self):
-        """Gives the reading of the magnetic field strength on the y axis in nano tesla, as a positive or negative integer, depending on the direction of the field."""
-        return 0
-
-    def get_z(self):
-        """Gives the reading of the magnetic field strength on the z axis in nano tesla, as a positive or negative integer, depending on the direction of the field."""
-        return 0
-
-    def heading(self):
-        """Gives the compass heading, calculated from the above readings, as an integer in the range from 0 to 360, representing the angle in degrees, clockwise, with north as 0."""
-        return 0
-
-    def get_field_strength(self):
-        """Returns an integer indication of the magnitude of the magnetic field around the device in nano tesla."""
-        return 0
-
-
-compass = _compass()
-
-# Microbit functions
 
 
 def panic(error_code: int) -> None:
