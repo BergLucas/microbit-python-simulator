@@ -137,6 +137,9 @@ def write(buf: Union[str, bytes, bytearray]) -> Optional[int]:
     uart.write(bytes([1, 2, 3]))
     ```
 
+    Args:
+        buf (Union[str, bytes, bytearray]): The buffer to write.
+
     Returns:
         Optional[int]: The number of bytes written or None on timeout.
     """
