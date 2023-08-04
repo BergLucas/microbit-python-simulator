@@ -1,6 +1,6 @@
+from microbit._internal import display as __display
 from typing import Union, Iterable, overload
 from microbit_client.image import Image
-from microbit import _internal
 
 
 def get_pixel(x: int, y: int) -> int:
@@ -16,7 +16,7 @@ def get_pixel(x: int, y: int) -> int:
     Returns:
         int: The brightness of the pixel, from 0 (dark) to 9 (bright)
     """
-    return _internal.display.get_pixel(x, y)
+    return __display.get_pixel(x, y)
 
 
 def set_pixel(x: int, y: int, value: int) -> None:
@@ -31,12 +31,12 @@ def set_pixel(x: int, y: int, value: int) -> None:
         ValueError: if the brightness is out of range
         ValueError: if x or y is out of the screen
     """
-    _internal.display.set_pixel(x, y, value)
+    __display.set_pixel(x, y, value)
 
 
 def clear() -> None:
     """Set the brightness of all LEDs to 0 (off)."""
-    _internal.display.clear()
+    __display.clear()
 
 
 @overload
@@ -101,7 +101,7 @@ def show(
     Raises:
         ValueError: if `delay` is negative
     """
-    _internal.display.show(image, delay, wait=wait, loop=loop, clear=clear)
+    __display.show(image, delay, wait=wait, loop=loop, clear=clear)
 
 
 def scroll(
@@ -133,17 +133,17 @@ def scroll(
     Raises:
         ValueError: if `delay` is negative
     """
-    _internal.display.scroll(text, delay, wait=wait, loop=loop, monospace=monospace)
+    __display.scroll(text, delay, wait=wait, loop=loop, monospace=monospace)
 
 
 def on() -> None:
     """Use on() to turn on the display."""
-    _internal.display.on()
+    __display.on()
 
 
 def off() -> None:
     """Use off() to turn off the display (thus allowing you to re-use the GPIO pins associated with the display for other purposes)."""
-    _internal.display.off()
+    __display.off()
 
 
 def is_on() -> bool:
@@ -152,7 +152,7 @@ def is_on() -> bool:
     Returns:
         bool: Whether the display is on
     """
-    return _internal.display.is_on()
+    __display.is_on()
 
 
 def read_light_level() -> int:
@@ -162,4 +162,4 @@ def read_light_level() -> int:
     Returns:
         int: The light level, between 0 and 255
     """
-    return _internal.display.read_light_level()
+    return __display.read_light_level()
