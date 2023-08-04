@@ -3,6 +3,7 @@ from microbit_protocol.commands.microbit import (
     MicrobitTemperatureCommand,
 )
 from microbit_protocol.peer import MicrobitPeer, MicrobitWebsocketPeer
+from microbit_protocol.exceptions import CommunicationClosed
 from microbit_protocol.commands import MicrobitCommand
 from microbit_simulator.accelerometer import MicrobitAccelerometer
 from microbit_simulator.display import MicrobitDisplay
@@ -51,13 +52,16 @@ class MicrobitSimulator(Tk):
             self.__button_a.peer = peer
             self.__button_b.peer = peer
             self.__accelerometer.peer = peer
-            peer.listen()
+            try:
+                peer.listen()
+            except CommunicationClosed:
+                self.peer = None
 
         Thread(target=target, daemon=True).start()
 
     def quit(self) -> None:
         """Quit the MicrobitSimulator window"""
-        self.__display.peer = None
+        self.__reset()
         super().quit()
 
     @property
@@ -270,9 +274,12 @@ class MicrobitSimulator(Tk):
     def __sync_temperature(self) -> None:
         """Sync the microbit's temperature value."""
         if self.__peer is not None:
-            self.__peer.send_command(
-                MicrobitTemperatureCommand(temperature=self.__temperature)
-            )
+            try:
+                self.__peer.send_command(
+                    MicrobitTemperatureCommand(temperature=self.__temperature)
+                )
+            except CommunicationClosed:
+                self.__peer = None
 
 
 def main() -> None:

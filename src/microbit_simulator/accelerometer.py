@@ -6,6 +6,7 @@ from microbit_protocol.commands.microbit.accelerometer import (
     MicrobitAccelerometerCurrentGesture,
     MicrobitAccelerometerSetRange,
 )
+from microbit_protocol.exceptions import CommunicationClosed
 from microbit_protocol.commands import MicrobitCommand
 from microbit_protocol.peer import MicrobitPeer
 from typing import Callable, Union, Literal, Optional
@@ -422,23 +423,35 @@ class MicrobitAccelerometer(ttk.Notebook):
     def __sync_x(self) -> None:
         """Sync the accelerometer's x value."""
         if self.__peer is not None:
-            self.__peer.send_command(MicrobitAccelerometerGetX(x=self.__x))
+            try:
+                self.__peer.send_command(MicrobitAccelerometerGetX(x=self.__x))
+            except CommunicationClosed:
+                self.__peer = None
 
     def __sync_y(self) -> None:
         """Sync the accelerometer's y value."""
         if self.__peer is not None:
-            self.__peer.send_command(MicrobitAccelerometerGetY(y=self.__y))
+            try:
+                self.__peer.send_command(MicrobitAccelerometerGetY(y=self.__y))
+            except CommunicationClosed:
+                self.__peer = None
 
     def __sync_z(self) -> None:
         """Sync the accelerometer's z value."""
         if self.__peer is not None:
-            self.__peer.send_command(MicrobitAccelerometerGetZ(z=self.__z))
+            try:
+                self.__peer.send_command(MicrobitAccelerometerGetZ(z=self.__z))
+            except CommunicationClosed:
+                self.__peer = None
 
     def __sync_current_gesture(self) -> None:
         """Sync the accelerometer's current_gesture value."""
         if self.__peer is not None:
-            self.__peer.send_command(
-                MicrobitAccelerometerCurrentGesture(
-                    current_gesture=self.__current_gesture
+            try:
+                self.__peer.send_command(
+                    MicrobitAccelerometerCurrentGesture(
+                        current_gesture=self.__current_gesture
+                    )
                 )
-            )
+            except CommunicationClosed:
+                self.__peer = None

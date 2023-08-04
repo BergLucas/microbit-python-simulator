@@ -1,4 +1,5 @@
 from microbit_protocol.commands.microbit import MicrobitButtonIsPressedCommand
+from microbit_protocol.exceptions import CommunicationClosed
 from microbit_protocol.peer import MicrobitPeer
 from microbit_simulator.utils import rgb
 from typing import Optional, Literal
@@ -99,8 +100,12 @@ class MicrobitButton(Canvas):
     def __sync_is_pressed(self) -> None:
         """Sync the button's is_pressed state."""
         if self.__peer is not None:
-            self.__peer.send_command(
-                MicrobitButtonIsPressedCommand(
-                    instance=self.__instance, is_pressed=self.__is_pressed
+            try:
+                self.__peer.send_command(
+                    MicrobitButtonIsPressedCommand(
+                        instance=self.__instance,
+                        is_pressed=self.__is_pressed,
+                    )
                 )
-            )
+            except CommunicationClosed:
+                self.__peer = None

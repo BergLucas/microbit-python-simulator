@@ -5,6 +5,7 @@ from microbit_protocol.commands.microbit.display import (
     MicrobitDisplaySetPixelCommand,
     MicrobitDisplayShowCommand,
 )
+from microbit_protocol.exceptions import CommunicationClosed
 from microbit_protocol.commands import MicrobitCommand
 from microbit_protocol.peer import MicrobitPeer
 from microbit_simulator.utils import rgb
@@ -286,6 +287,9 @@ class MicrobitDisplay(Frame):
     def __sync_light_level(self) -> None:
         """Sync the display's light_level value."""
         if self.__peer is not None:
-            self.__peer.send_command(
-                MicrobitDisplayReadLightLevelCommand(light_level=self.__light_level)
-            )
+            try:
+                self.__peer.send_command(
+                    MicrobitDisplayReadLightLevelCommand(light_level=self.__light_level)
+                )
+            except CommunicationClosed:
+                self.__peer = None
