@@ -36,5 +36,24 @@ class Microbit:
     def running_time(self) -> Union[int, float]:
         return (time.time() - self.__start_time) * 1000
 
+    def scale(
+        self,
+        value: Union[int, float],
+        from_: tuple[Union[int, float], Union[int, float]],
+        to: tuple[Union[int, float], Union[int, float]],
+    ) -> Union[int, float]:
+        from_min, from_max = from_
+        to_min, to_max = to
+
+        from_ratio = from_max - from_min
+        to_ratio = to_max - to_min
+
+        result = (value - from_min) / from_ratio * to_ratio + to_min
+
+        if isinstance(to_min, float) or isinstance(to_max, float):
+            return round(result)
+        else:
+            return result
+
     def temperature(self) -> int:
         return self.__temperature
