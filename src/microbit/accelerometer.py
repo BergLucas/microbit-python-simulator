@@ -1,19 +1,6 @@
+from microbit_protocol.commands.microbit.accelerometer import Gesture
+from microbit._internal import accelerometer as _accelerometer
 from typing import Literal
-
-Gesture = Literal[
-    "",
-    "up",
-    "down",
-    "left",
-    "right",
-    "face up",
-    "face down",
-    "freefall",
-    "3g",
-    "6g",
-    "8g",
-    "shake",
-]
 
 
 def get_x() -> int:
@@ -22,7 +9,7 @@ def get_x() -> int:
     Returns:
         int: The acceleration measurement in the x axis in milli-g. By default the accelerometer is configured with a range of +/- 2g, and so this method will return within the range of +/- 2000mg.
     """
-    ...
+    return _accelerometer.get_x()
 
 
 def get_y() -> int:
@@ -31,7 +18,7 @@ def get_y() -> int:
     Returns:
         int: The acceleration measurement in the y axis in milli-g. By default the accelerometer is configured with a range of +/- 2g, and so this method will return within the range of +/- 2000mg.
     """
-    ...
+    return _accelerometer.get_y()
 
 
 def get_z() -> int:
@@ -40,7 +27,7 @@ def get_z() -> int:
     Returns:
         int: The acceleration measurement in the z axis in milli-g. By default the accelerometer is configured with a range of +/- 2g, and so this method will return within the range of +/- 2000mg.
     """
-    ...
+    return _accelerometer.get_z()
 
 
 def get_values() -> tuple[int, int, int]:
@@ -48,7 +35,7 @@ def get_values() -> tuple[int, int, int]:
 
     Returns:
         tuple[int, int, int]: The acceleration measurements in all axes at once, as a three-element tuple of integers ordered as X, Y, Z. By default the accelerometer is configured with a range of +/- 2g, and so X, Y, and Z will be within the range of +/-2000mg."""
-    ...
+    return _accelerometer.get_values()
 
 
 def get_strength() -> int:
@@ -57,7 +44,7 @@ def get_strength() -> int:
     Returns:
         int: The combined acceleration strength of all the axes, in milli-g.
     """
-    ...
+    return _accelerometer.get_strength()
 
 
 def current_gesture() -> Gesture:
@@ -66,7 +53,7 @@ def current_gesture() -> Gesture:
     Returns:
         Gesture: The name of the current gesture.
     """
-    ...
+    return _accelerometer.current_gesture()
 
 
 def is_gesture(name: Gesture) -> bool:
@@ -78,7 +65,7 @@ def is_gesture(name: Gesture) -> bool:
     Returns:
         bool: True if the named gesture is currently active, False otherwise.
     """
-    ...
+    return _accelerometer.is_gesture(name)
 
 
 def was_gesture(name: Gesture) -> bool:
@@ -90,7 +77,7 @@ def was_gesture(name: Gesture) -> bool:
     Returns:
         bool: True if the named gesture was active since the last call, False otherwise.
     """
-    ...
+    return _accelerometer.was_gesture(name)
 
 
 def get_gestures() -> tuple[Gesture]:
@@ -101,7 +88,7 @@ def get_gestures() -> tuple[Gesture]:
     Returns:
         A tuple of the gesture history, most recent is listed last.
     """
-    ...
+    return _accelerometer.get_gestures()
 
 
 def set_range(value: Literal[2, 4, 8]) -> None:
@@ -111,4 +98,4 @@ def set_range(value: Literal[2, 4, 8]) -> None:
     Args:
         value (Literal[2, 4, 8]): New range for the accelerometer, an integer in g.
     """
-    ...
+    return _accelerometer.set_range(value)
