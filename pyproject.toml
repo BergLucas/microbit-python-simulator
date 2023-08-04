@@ -6,9 +6,11 @@ authors = ["Lucas Berg <55436804+BergLucas@users.noreply.github.com>"]
 readme = "README.md"
 packages = [
     {include = "microbit", from = "src"},
+    {include = "microbit_client", from = "src"},
     {include = "microbit_protocol", from = "src"},
     {include = "microbit_simulator", from = "src"},
-    {include = "radio", from = "src"}
+    {include = "radio", from = "src"},
+    {include = "synchronisation", from = "src"}
 ]
 
 [tool.poetry.dependencies]
