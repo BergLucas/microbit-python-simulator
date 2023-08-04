@@ -8,13 +8,14 @@ from microbit_protocol.commands.microbit.accelerometer import (
     MicrobitAccelerometerSetRange,
 )
 from microbit_protocol.peer import MicrobitPeer
-from typing import Literal
+from typing import Union, Literal
 import math
 
 
 class Accelerometer:
     def __init__(self, peer: MicrobitPeer) -> None:
         self.__peer = peer
+        self.__current_gesture: Union[Gesture, Literal[""]] = ""
         self.__gestures: list[Gesture] = []
         self.set_range(2)
         self.__x = 0
@@ -29,7 +30,9 @@ class Accelerometer:
             if isinstance(command, MicrobitAccelerometerGetZ):
                 self.__z = command.z
             if isinstance(command, MicrobitAccelerometerCurrentGesture):
-                self.__gestures.append(command.current_gesture)
+                self.__current_gesture = command.current_gesture
+                if command.current_gesture != "":
+                    self.__gestures.append(command.current_gesture)
 
         peer.add_listener(listener)
 
@@ -50,11 +53,11 @@ class Accelerometer:
             math.sqrt(self.__x * self.__x + self.__y * self.__y + self.__z * self.__z)
         )
 
-    def current_gesture(self) -> Gesture:
-        return self.__gestures[-1]
+    def current_gesture(self) -> Union[Gesture, Literal[""]]:
+        return self.__current_gesture
 
     def is_gesture(self, name: Gesture) -> bool:
-        return self.current_gesture() == name
+        return self.__current_gesture == name
 
     def was_gesture(self, name: Gesture) -> bool:
         return name in self.__gestures

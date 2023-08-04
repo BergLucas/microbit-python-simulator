@@ -2,7 +2,6 @@ from typing import Literal, Union
 from pydantic import BaseModel
 
 Gesture = Literal[
-    "",
     "up",
     "down",
     "left",
@@ -36,7 +35,7 @@ class MicrobitAccelerometerCurrentGesture(BaseModel):
     command: Literal[
         "microbit.accelerometer.current_gesture"
     ] = "microbit.accelerometer.current_gesture"
-    current_gesture: Gesture
+    current_gesture: Union[Gesture, Literal[""]]
 
 
 class MicrobitAccelerometerSetRange(BaseModel):

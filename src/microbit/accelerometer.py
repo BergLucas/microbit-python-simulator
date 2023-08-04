@@ -1,6 +1,6 @@
 from microbit_protocol.commands.microbit.accelerometer import Gesture
 from microbit._internal import accelerometer as _accelerometer
-from typing import Literal
+from typing import Union, Literal
 
 
 def get_x() -> int:
@@ -47,11 +47,11 @@ def get_strength() -> int:
     return _accelerometer.get_strength()
 
 
-def current_gesture() -> Gesture:
+def current_gesture() -> Union[Gesture, Literal[""]]:
     """Return a String with the name of the current gesture.
 
     Returns:
-        Gesture: The name of the current gesture.
+        Union[Gesture, Literal[""]]: The name of the current gesture.
     """
     return _accelerometer.current_gesture()
 
