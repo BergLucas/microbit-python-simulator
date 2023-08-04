@@ -1,11 +1,11 @@
-from ..utils import rgb
+from .utils import rgb
 from tkinter import Canvas, Widget
 from typing import Union
 
 
-class MCBButtonRenderer(Canvas):
+class ButtonWidget(Canvas):
     def __init__(self, master: Widget, size: int, buttonKey: Union[str, None] = None):
-        """Create a MCBButtonRenderer object
+        """Create a ButtonWidget object
 
         Parameters:
         -----------

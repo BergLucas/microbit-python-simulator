@@ -1,10 +1,10 @@
 import time
 from .utils import rgb
 from .Settings import *
-from .button.MCBButtonRenderer import MCBButtonRenderer
+from .button import ButtonWidget
 from .display.MCBDisplayRenderer import MCBDisplayRenderer
-from .accelerometer.AccelerometerWidget import AccelerometerWidget
-from tkinter import Tk, Frame, Canvas
+from .accelerometer import AccelerometerWidget
+from tkinter import Tk, Canvas
 
 
 class MicrobitSimulator(Tk):
@@ -39,11 +39,11 @@ class MicrobitSimulator(Tk):
         buttons_size = width * 0.15
         rely = (1 - buttons_size / height) / 2
         # Setup button a
-        button_a = MCBButtonRenderer(self.__background, int(buttons_size), BUTTON_A)
+        button_a = ButtonWidget(self.__background, int(buttons_size), BUTTON_A)
         button_a.place(relx=0.05, rely=rely)
         self.__buttons["A"] = button_a
         # Setup button b
-        button_b = MCBButtonRenderer(self.__background, int(buttons_size), BUTTON_B)
+        button_b = ButtonWidget(self.__background, int(buttons_size), BUTTON_B)
         button_b.place(relx=0.80, rely=rely)
         self.__buttons["B"] = button_b
         # Setup accelerometer
@@ -75,7 +75,7 @@ class MicrobitSimulator(Tk):
         """
         return self.__accelerometer
 
-    def getButton(self, name: str) -> MCBButtonRenderer:
+    def getButton(self, name: str) -> ButtonWidget:
         """Get the requested button object of the MicrobitSimulator
 
         Parameters:
@@ -84,7 +84,7 @@ class MicrobitSimulator(Tk):
 
         Returns:
         --------
-        button : The accelerometer of the MicrobitSimulator (MCBButtonRenderer)
+        button : The accelerometer of the MicrobitSimulator (ButtonWidget)
 
         Raises:
         -------
