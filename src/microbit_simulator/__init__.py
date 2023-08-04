@@ -273,3 +273,10 @@ class MicrobitSimulator(Tk):
             self.__peer.send_command(
                 MicrobitTemperatureCommand(temperature=self.__temperature)
             )
+
+
+def main() -> None:
+    """Start the MicrobitSimulator."""
+    simulator = MicrobitSimulator()
+    simulator.open()
+    simulator.mainloop()

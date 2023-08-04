@@ -11,9 +11,12 @@ from microbit_client.microbit import Microbit
 from microbit_client.display import Display
 from _thread import interrupt_main
 from threading import Thread
+import subprocess
 import logging
 
 logger = logging.getLogger(__name__)
+
+process = subprocess.Popen(["python", "-m", "microbit_simulator"], shell=True)
 
 peer = MicrobitWebsocketPeer.connect("localhost", 8765)
 
@@ -49,6 +52,7 @@ def target() -> None:
         peer.listen()
     except CommunicationClosed:
         logger.warning("Connection closed unexpectedly")
+    process.kill()
     interrupt_main()
 
 
