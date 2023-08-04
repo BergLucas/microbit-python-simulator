@@ -22,7 +22,7 @@ from microbit._internal import (
     pin19,
     pin20,
 )
-from microbit import display, spi, uart, ic2, compass
+from microbit import display, spi, uart, ic2, compass, accelerometer
 from microbit_client.image import Image
 import time, time as utime
 from typing import Union
