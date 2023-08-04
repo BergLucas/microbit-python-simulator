@@ -1,5 +1,5 @@
 from microbit_client.pin import MicroBitDigitalPin
-from microbit import pin13, pin15, pin14
+from microbit._internal import pin13, pin15, pin14
 from typing import Union
 
 
