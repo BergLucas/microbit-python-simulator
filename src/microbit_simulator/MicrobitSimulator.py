@@ -3,7 +3,7 @@ from .utils import rgb
 from .Settings import *
 from .button.MCBButtonRenderer import MCBButtonRenderer
 from .display.MCBDisplayRenderer import MCBDisplayRenderer
-from .accelerometer.MCBAccelerometerRenderer import MCBAccelerometerRenderer
+from .accelerometer.AccelerometerWidget import AccelerometerWidget
 from tkinter import Tk, Frame, Canvas
 
 
@@ -48,7 +48,7 @@ class MicrobitSimulator(Tk):
         self.__buttons["B"] = button_b
         # Setup accelerometer
         self.geometry(f"{900}x{height}")
-        self.__accelerometer = MCBAccelerometerRenderer(self, 200, int(height))
+        self.__accelerometer = AccelerometerWidget(self, 200, int(height))
         self.__accelerometer.place(x=700, y=0)
 
     def quit(self):
@@ -66,7 +66,7 @@ class MicrobitSimulator(Tk):
         """
         return self.__display
 
-    def getAccelerometer(self) -> MCBAccelerometerRenderer:
+    def getAccelerometer(self) -> AccelerometerWidget:
         """Get the accelerometer object of the MicrobitSimulator
 
         Returns:

@@ -1,4 +1,3 @@
-from .Settings import *
 from tkinter import (
     Frame,
     ttk,
@@ -12,10 +11,33 @@ from tkinter import (
 )
 from tkinter.font import Font
 
+GESTURES_BUTTONS = {
+    "up": "1",
+    "down": "2",
+    "left": "3",
+    "right": "4",
+    "face up": "5",
+    "face down": "6",
+    "freefall": "7",
+    "3g": "8",
+    "6g": "9",
+    "8g": "0",
+    "shake": ")",
+}
+SLIDERS_BUTTONS = {
+    "X_increase": "Right",
+    "X_decrease": "Left",
+    "Y_increase": "Down",
+    "Y_decrease": "Up",
+    "Z_increase": "Shift_L",
+    "Z_decrease": "Control_L",
+}
+SLIDERS_SPEED = 2000
+JOYSTICK_MODE = True
 
-class MCBAccelerometerRenderer(ttk.Notebook):
+class AccelerometerWidget(ttk.Notebook):
     def __init__(self, master: Widget, width: int, height: int):
-        """Create a MCBAccelerometerRenderer object
+        """Create a AccelerometerWidget object
 
         Parameters:
         -----------
