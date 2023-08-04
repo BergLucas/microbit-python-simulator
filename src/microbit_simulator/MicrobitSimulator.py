@@ -1,162 +1,264 @@
-import time
-from .utils import rgb
-from .Settings import *
-from .button import ButtonWidget
-from .display import DisplayWidget
-from .accelerometer import AccelerometerWidget
-from tkinter import Tk, Canvas
+from microbit_protocol.commands.microbit import (
+    MicrobitResetCommand,
+    MicrobitTemperatureCommand,
+)
+from microbit_protocol.peer import MicrobitPeer, MicrobitWebsocketPeer
+from microbit_protocol.commands import MicrobitCommand
+from microbit_simulator.accelerometer import AccelerometerWidget
+from microbit_simulator.display import MicrobitDisplay
+from microbit_simulator.button import MicrobitButton, BUTTON_A, BUTTON_B
+from microbit_simulator.utils import rgb
+from tkinter import Tk, Misc, Canvas
+from typing import Optional, Literal
+from threading import Thread
 
 
 class MicrobitSimulator(Tk):
-    def __init__(self, width: int = 700, height: int = 500):
-        """Create a MicrobitSimulator window
+    def __init__(self, width: int = 900, height: int = 500) -> None:
+        """Initialises self to a MicrobitSimulator.
 
-        Parameters:
-        -----------
-        width : The width of the window (optional - default: 700) (int)
-
-        height : The height of the window (optional - default: 500) (int)
+        Args:
+            width (int, optional): The width of the window. Defaults to 900.
+            height (int, optional): The height of the window. Defaults to 500.
         """
         Tk.__init__(self)
+
         self.geometry(f"{width}x{height}")
         self.title("Microbit Simulator")
         self.protocol("WM_DELETE_WINDOW", self.quit)
-        self.resizable(0, 0)
-        # General properties
-        self.__start = time.time()
-        self.__temperature = 0
-        # Create background
-        self.__background = Canvas(self, bg=rgb(25, 25, 25), highlightthickness=0)
-        self.__background.place(x=0, y=0, width=width, height=height)
-        # Create display
-        x_space = 0.4
-        size = width * x_space
-        y_space = size / height
-        self.__display = DisplayWidget(self.__background, int(size))
-        self.__display.place(relx=(1 - x_space) / 2, rely=(1 - y_space) / 2)
-        # Setup buttons
-        self.__buttons = {}
-        buttons_size = width * 0.15
-        rely = (1 - buttons_size / height) / 2
-        # Setup button a
-        button_a = ButtonWidget(self.__background, int(buttons_size), BUTTON_A)
-        button_a.place(relx=0.05, rely=rely)
-        self.__buttons["A"] = button_a
-        # Setup button b
-        button_b = ButtonWidget(self.__background, int(buttons_size), BUTTON_B)
-        button_b.place(relx=0.80, rely=rely)
-        self.__buttons["B"] = button_b
-        # Setup accelerometer
-        self.geometry(f"{900}x{height}")
-        self.__accelerometer = AccelerometerWidget(self, 200, int(height))
-        self.__accelerometer.place(x=700, y=0)
+        self.resizable(False, False)
 
-    def quit(self):
+        self.__temperature = 0
+        self.__peer: Optional[MicrobitPeer] = None
+
+        self.__background = self.__place_background(self, height, width)
+        self.__display = self.__place_display(self.__background, 0, height, 700)
+        self.__button_a = self.__place_button(
+            self.__background, 0.15, 0.05, height, 700, "button_a", BUTTON_A
+        )
+        self.__button_b = self.__place_button(
+            self.__background, 0.15, 0.80, height, 700, "button_b", BUTTON_B
+        )
+        self.__accelerometer = self.__place_accelerometer(
+            self.__background, 700, height, 200
+        )
+
+    def open(self) -> None:
+        def target():
+            peer = MicrobitWebsocketPeer.wait_for_connection("localhost", 8765)
+            self.peer = peer
+            self.__display.peer = peer
+            self.__button_a.peer = peer
+            self.__button_b.peer = peer
+            peer.listen()
+
+        Thread(target=target, daemon=True).start()
+
+    def quit(self) -> None:
         """Quit the MicrobitSimulator window"""
-        # Stop the threads
-        self.__display.shutdown()
+        self.__display.peer = None
         super().quit()
 
-    def getDisplay(self) -> DisplayWidget:
-        """Get the display object of the MicrobitSimulator
+    @property
+    def peer(self) -> Optional[MicrobitPeer]:
+        """Return the microbit peer.
 
         Returns:
-        --------
-        display : The display of the MicrobitSimulator (DisplayWidget)
+            Optional[MicrobitPeer]: The microbit peer.
+        """
+        return self.__peer
+
+    @peer.setter
+    def peer(self, value: Optional[MicrobitPeer]) -> None:
+        """Set the microbit peer.
+
+        Args:
+            value (Optional[MicrobitPeer]): The microbit peer.
+        """
+        if self.__peer is not None:
+            self.__peer.remove_listener(self.__execute)
+
+        if value is not None:
+            value.add_listener(self.__execute)
+
+        self.__peer = value
+        self.__sync_temperature()
+
+    @property
+    def display(self) -> MicrobitDisplay:
+        """Returns the display of the MicrobitSimulator.
+
+        Returns:
+            MicrobitDisplay: The display of the MicrobitSimulator.
         """
         return self.__display
 
-    def getAccelerometer(self) -> AccelerometerWidget:
-        """Get the accelerometer object of the MicrobitSimulator
+    @property
+    def button_a(self) -> MicrobitButton:
+        """Returns the A button of the MicrobitSimulator.
 
         Returns:
-        --------
-        accelerometer : The accelerometer of the MicrobitSimulator (DisplayWidget)
+            ButtonWidget: The A button of the MicrobitSimulator.
         """
-        return self.__accelerometer
+        return self.__button_a
 
-    def getButton(self, name: str) -> ButtonWidget:
-        """Get the requested button object of the MicrobitSimulator
-
-        Parameters:
-        -----------
-        name : The name of the requested button (str)
+    @property
+    def button_b(self) -> MicrobitButton:
+        """Returns the B button of the MicrobitSimulator.
 
         Returns:
-        --------
-        button : The accelerometer of the MicrobitSimulator (ButtonWidget)
-
-        Raises:
-        -------
-        TypeError if a parameter has an invalid type
-
-        ValueError if the name is invalid
+            ButtonWidget: The B button of the MicrobitSimulator.
         """
-        if not isinstance(name, str):
-            raise TypeError(f"invalid type : {type(name)} is not a str")
-        if name not in self.__buttons:
-            raise ValueError(f"The button {name} does not exist")
-        return self.__buttons[name]
+        return self.__button_b
 
-    def panic(self, error_code: int):
-        """Display an error code on the display
-
-        Parameters:
-        -----------
-        error_code : The code of the error (int)
-
-        Raises:
-        -------
-        TypeError if a parameter has an invalid type
-
-        ValueError if the error code is not between 0 and 255
-        """
-        if not isinstance(error_code, int):
-            raise TypeError(f"invalid type : {type(error_code)} is not a int")
-        if error_code < 0 or 255 < error_code:
-            raise ValueError("the error code must be between 0 and 255")
-        self.__display.scroll(error_code, monospace=True, loop=True)
-
-    def reset(self):
-        """Reset the MicrobitSimulator"""
-        self.__start = time.time()
-        self.__display.clear()
-        for button_id in self.__buttons:
-            self.__buttons[button_id].reset()
-
-    def sleep(self, milliseconds: int):
-        """Wait a number of milliseconds
-
-        Parameters:
-        -----------
-        milliseconds : The number of milliseconds (int)
-
-        Raises:
-        -------
-        TypeError if a parameter has an invalid type
-
-        ValueError if the time is negative
-        """
-        if not isinstance(milliseconds, int):
-            raise TypeError(f"invalid type : {type(milliseconds)} is not a int")
-        if milliseconds < 0:
-            raise ValueError("the milliseconds can not be negative")
-        time.sleep(milliseconds / 1000)
-
-    def running_time(self) -> int:
-        """Return the running time of the MicrobitSimulator in milliseconds
-
-        Returns:
-        --------
-        run_time : The running time of the MicrobitSimulator in milliseconds (int)
-        """
-        return time.time() - self.__start
-
+    @property
     def temperature(self) -> int:
-        """Return the temperature
+        """Returns the temperature of the MicrobitSimulator.
 
         Returns:
-        --------
-        temperature : The temperature (int)
+            int: The temperature of the MicrobitSimulator.
         """
         return self.__temperature
+
+    @temperature.setter
+    def temperature(self, value: int) -> None:
+        """Sets the temperature of the MicrobitSimulator.
+
+        Args:
+            value (int): The new temperature of the MicrobitSimulator.
+        """
+        self.__temperature = value
+        self.__sync_temperature()
+
+    @staticmethod
+    def __place_background(master: Misc, height: int, width: int) -> Canvas:
+        """Places the background in the center of the window.
+
+        Args:
+            master (Misc): The parent widget.
+            height (int): The height of the window.
+            width (int): The width of the window.
+
+        Returns:
+            Canvas: The background of the MicrobitSimulator.
+        """
+        background = Canvas(master, bg=rgb(25, 25, 25), highlightthickness=0)
+        background.place(x=0, y=0, width=width, height=height)
+
+        master.update_idletasks()
+
+        return background
+
+    @staticmethod
+    def __place_display(
+        master: Misc, relx: float, height: int, width: int
+    ) -> MicrobitDisplay:
+        """Places the display in the center of the window.
+
+        Args:
+            master (Misc): The parent widget.
+            relx (float): The relative x position of the display.
+            height (int): The height of the window.
+            width (int): The width of the window.
+
+        Returns:
+            MicrobitDisplay: The display of the MicrobitSimulator.
+        """
+        x_space = 0.4
+        size = width * x_space
+        y_space = size / height
+        width_ratio = width / master.winfo_width()
+
+        display = MicrobitDisplay(master, int(size))
+        display.place(
+            relx=relx + width_ratio * (1 - x_space) / 2,
+            rely=(1 - y_space) / 2,
+        )
+
+        master.update_idletasks()
+
+        return display
+
+    @staticmethod
+    def __place_button(
+        master: Misc,
+        rwidth: float,
+        relx: float,
+        height: int,
+        width: int,
+        instance: Literal["button_a", "button_b"],
+        button_key: str,
+    ) -> MicrobitButton:
+        """Places the button at the given relx position in the window.
+
+        Args:
+            master (Misc): The parent widget.
+            rwidth (float): The relative width of the button.
+            relx (float): The relative x position of the button.
+            height (int): The height of the window.
+            width (int): The width of the window.
+            instance (Literal["button_a", "button_b"]): The instance of the button.
+            button_key (str): The key of the button.
+
+        Returns:
+            ButtonWidget: The button of the MicrobitSimulator.
+        """
+        buttons_size = width * 0.15
+        rely = (1 - buttons_size / height) / 2
+        width_ratio = width / master.winfo_width()
+
+        button = MicrobitButton(master, int(rwidth * width), instance, button_key)
+        button.place(relx=relx * width_ratio, rely=rely)
+
+        master.update_idletasks()
+
+        return button
+
+    @staticmethod
+    def __place_accelerometer(
+        master: Misc, x: int, height: int, width: int
+    ) -> AccelerometerWidget:
+        """Places the accelerometer in the center of the window.
+
+        Args:
+            master (Misc): The parent widget.
+            x (int): The x position of the accelerometer.
+            height (int): The height of the window.
+            width (int): The width of the window.
+
+        Returns:
+            AccelerometerWidget: The accelerometer of the MicrobitSimulator.
+        """
+        accelerometer = AccelerometerWidget(master, width, height)
+        accelerometer.place(x=x, y=0)
+
+        master.update_idletasks()
+
+        return accelerometer
+
+    def __execute(self, command: MicrobitCommand) -> None:
+        """Execute the given command.
+
+        Args:
+            command (MicrobitCommand): The command to execute.
+        """
+        if isinstance(command, MicrobitResetCommand):
+            self.__reset()
+
+    def __reset(self) -> None:
+        """Reset the MicrobitSimulator."""
+        if self.__peer is not None:
+            self.__peer.stop()
+            self.__peer.close()
+
+            self.peer = None
+            self.__display.peer = None
+            self.__button_a.peer = None
+            self.__button_b.peer = None
+
+    def __sync_temperature(self) -> None:
+        """Sync the microbit's temperature value."""
+        if self.__peer is not None:
+            self.__peer.send_command(
+                MicrobitTemperatureCommand(temperature=self.__temperature)
+            )

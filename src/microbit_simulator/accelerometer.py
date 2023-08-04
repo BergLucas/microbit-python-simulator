@@ -6,8 +6,7 @@ from tkinter import (
     Spinbox,
     Button,
     IntVar,
-    Widget,
-    Tk,
+    Misc,
 )
 from tkinter.font import Font
 
@@ -35,13 +34,14 @@ SLIDERS_BUTTONS = {
 SLIDERS_SPEED = 2000
 JOYSTICK_MODE = True
 
+
 class AccelerometerWidget(ttk.Notebook):
-    def __init__(self, master: Widget, width: int, height: int):
+    def __init__(self, master: Misc, width: int, height: int):
         """Create a AccelerometerWidget object
 
         Parameters:
         -----------
-        master : The parent widget (Widget)
+        master : The parent widget (Misc)
 
         width : The width of the accelerometer (int)
 
@@ -53,7 +53,7 @@ class AccelerometerWidget(ttk.Notebook):
 
         ValueError if height <= 0 or width <= 0
         """
-        if not isinstance(master, (Widget, Tk)):
+        if not isinstance(master, Misc):
             raise TypeError(f"invalid type : {type(master)} is not a Widget")
         if not isinstance(width, int):
             raise TypeError(f"invalid type : {type(width)} is not a int")
@@ -104,13 +104,13 @@ class AccelerometerWidget(ttk.Notebook):
         z_slider.grid(row=0, column=2, sticky="ns")
 
     def __add_slider(
-        self, master: Widget, width: int, name: str, value_callback, invertSlider: bool
+        self, master: Misc, width: int, name: str, value_callback, invertSlider: bool
     ):
         """Add a slider
 
         Parameters:
         -----------
-        master : The parent widget (Widget)
+        master : The parent widget (Misc)
 
         width : The width of the slider (int)
 
@@ -229,7 +229,7 @@ class AccelerometerWidget(ttk.Notebook):
 
     def __add_gesture(
         self,
-        master: Widget,
+        master: Misc,
         width: int,
         height: int,
         row: int,
@@ -241,7 +241,7 @@ class AccelerometerWidget(ttk.Notebook):
 
         Parameters:
         -----------
-        master : The parent widget (Widget)
+        master : The parent widget (Misc)
 
         width : The width of the gesture frame (int)
 

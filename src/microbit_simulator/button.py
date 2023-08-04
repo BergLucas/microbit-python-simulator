@@ -1,34 +1,31 @@
-from .utils import rgb
-from tkinter import Canvas, Widget
-from typing import Union
+from microbit_protocol.commands.microbit import MicrobitButtonIsPressedCommand
+from microbit_protocol.peer import MicrobitPeer
+from microbit_simulator.utils import rgb
+from typing import Optional, Literal
+from tkinter import Canvas, Misc
+
+BUTTON_A = "a"
+BUTTON_B = "b"
 
 
-class ButtonWidget(Canvas):
-    def __init__(self, master: Widget, size: int, buttonKey: Union[str, None] = None):
-        """Create a ButtonWidget object
+class MicrobitButton(Canvas):
+    def __init__(
+        self,
+        master: Misc,
+        size: int,
+        instance: Literal["button_a", "button_b"],
+        button_key: str,
+    ) -> None:
+        """Initialises self to a MicrobitButton.
 
-        Parameters:
-        -----------
-        master : The parent widget (Widget)
-
-        size : The size of the button (int)
-
-        buttonKey : The keyboard key associated to the button (optional - default: None) (Union[str, None])
-
-        Raises:
-        -------
-        TypeError if a parameter has an invalid type
-
-        ValueError if size <= 0
+        Args:
+            master (Misc): The parent widget.
+            size (int): The size of the button. Must be positive.
+            instance (Literal["button_a", "button_b"]): The button instance.
+            button_key (str): The button key.
         """
-        if not isinstance(master, Widget):
-            raise TypeError(f"invalid type : {type(master)} is not a Widget")
-        if not isinstance(size, int):
-            raise TypeError(f"invalid type : {type(size)} is not a int")
-        if not isinstance(buttonKey, (type(None), str)):
-            raise TypeError(f"invalid type : {type(buttonKey)} is not None or a str")
-        if size <= 0:
-            raise ValueError(f"invalid size : size can not be negative")
+        assert size > 0
+
         Canvas.__init__(
             self,
             master,
@@ -37,63 +34,73 @@ class ButtonWidget(Canvas):
             bg=rgb(150, 150, 150),
             highlightthickness=0,
         )
-        self.reset()
-        # Create round
+
+        self.__is_pressed = False
+        self.__instance: Literal["button_a", "button_b"] = instance
+        self.__peer: Optional[MicrobitPeer] = None
+
         self.__round = self.create_oval(
             size // 4, size // 4, 3 * size // 4, 3 * size // 4, fill="black"
         )
-        self.tag_bind(self.__round, "<Button-1>", lambda e: self.press())
-        if buttonKey is not None:
-            self.bind_all(f"<KeyPress-{buttonKey}>", lambda e: self.press())
-        self.tag_bind(self.__round, "<ButtonRelease-1>", lambda e: self.release())
-        if buttonKey is not None:
-            self.bind_all(f"<KeyRelease-{buttonKey}>", lambda e: self.release())
 
-    def press(self):
+        self.tag_bind(self.__round, "<Button-1>", lambda _: self.press())
+        self.tag_bind(self.__round, "<ButtonRelease-1>", lambda _: self.release())
+
+        self.bind_all(f"<KeyPress-{button_key}>", lambda _: self.press())
+        self.bind_all(f"<KeyRelease-{button_key}>", lambda _: self.release())
+
+    @property
+    def peer(self) -> Optional[MicrobitPeer]:
+        """Return the microbit peer.
+
+        Returns:
+            Optional[MicrobitPeer]: The microbit peer.
+        """
+        return self.__peer
+
+    @peer.setter
+    def peer(self, value: Optional[MicrobitPeer]) -> None:
+        """Set the microbit peer.
+
+        Args:
+            value (Optional[MicrobitPeer]): The microbit peer.
+        """
+        self.__sync_is_pressed()
+        self.__peer = value
+
+    def press(self) -> None:
         """Press the button"""
+        was_pressed = self.__is_pressed
+
         self.__is_pressed = True
-        self.__was_pressed = True
-        self.__get_presses += 1
         self.itemconfig(self.__round, fill=rgb(30, 30, 30))
 
-    def release(self):
+        if not was_pressed:
+            self.__sync_is_pressed()
+
+    def release(self) -> None:
         """Release the button"""
+        was_pressed = self.__is_pressed
+
         self.__is_pressed = False
         self.itemconfig(self.__round, fill="black")
 
-    def reset(self):
-        """Reset the state of the button"""
-        self.__is_pressed = False
-        self.__was_pressed = False
-        self.__get_presses = 0
+        if was_pressed:
+            self.__sync_is_pressed()
 
     def is_pressed(self) -> bool:
-        """Check if the button is pressed
+        """Returns whether the button is pressed.
 
         Returns:
-        --------
-        pressed : True if the button is being pressed, False otherwise
+            bool: Whether the button is pressed.
         """
         return self.__is_pressed
 
-    def was_pressed(self) -> bool:
-        """Check if the button was pressed
-
-        Returns:
-        --------
-        pressed : True if the button has been pressed since this was last called, False otherwise
-        """
-        pressed = self.__was_pressed
-        self.__was_pressed = False
-        return pressed
-
-    def get_presses(self) -> int:
-        """Returns the number of times the button has been pressed since this method was last called, then resets the count
-
-        Returns:
-        --------
-        presses : The number of presses (int)
-        """
-        presses = self.__get_presses
-        self.__get_presses = 0
-        return presses
+    def __sync_is_pressed(self) -> None:
+        """Sync the button's is_pressed state."""
+        if self.__peer is not None:
+            self.__peer.send_command(
+                MicrobitButtonIsPressedCommand(
+                    instance=self.__instance, is_pressed=self.__is_pressed
+                )
+            )
