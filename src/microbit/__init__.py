@@ -22,27 +22,10 @@ from microbit._internal import (
     pin19,
     pin20,
 )
-from microbit import display, spi, uart
+from microbit import display, spi, uart, ic2
 from microbit_client.image import Image
 import time, time as utime
 from typing import Union
-
-
-class _i2c:
-    def init(self, freq=100000, sda=pin20, scl=pin19):
-        """Re-initialize peripheral with the specified clock frequency freq on the specified sda and scl pins.
-        Warning
-        Changing the I²C pins from defaults will make the accelerometer and compass stop working, as they are connected internally to those pins."""
-
-    def scan(self):
-        """Scan the bus for devices. Returns a list of 7-bit addresses corresponding to those devices that responded to the scan."""
-        return []
-
-    def read(self, addr, n, repeat=False):
-        """Read n bytes from the device with 7-bit address addr. If repeat is True, no stop bit will be sent."""
-
-    def write(self, addr, buf, repeat=False):
-        """Write bytes from buf to the device with 7-bit address addr. If repeat is True, no stop bit will be sent."""
 
 
 class _compass:
@@ -77,7 +60,6 @@ class _compass:
         return 0
 
 
-i2c = _i2c()
 compass = _compass()
 
 # Microbit functions
