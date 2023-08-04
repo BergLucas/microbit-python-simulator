@@ -38,7 +38,7 @@ def panic(error_code: int) -> None:
     Args:
         n (int): An arbitrary integer between 0 and 255 to indicate an error code.
     """
-    __microbit.panic(error_code)
+    display.scroll(error_code, monospace=True, loop=True)
 
 
 def reset() -> None:

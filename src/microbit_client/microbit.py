@@ -1,5 +1,4 @@
 from microbit_protocol.commands.microbit import (
-    MicrobitPanicCommand,
     MicrobitResetCommand,
     MicrobitTemperatureCommand,
 )
@@ -23,9 +22,6 @@ class Microbit:
                 self.__temperature = command.temperature
 
         peer.add_listener(listener)
-
-    def panic(self, n: int) -> None:
-        self.__peer.send_command(MicrobitPanicCommand(n=n))
 
     def reset(self) -> None:
         self.__peer.send_command(MicrobitResetCommand())
