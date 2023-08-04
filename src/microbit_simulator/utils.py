@@ -1,16 +1,15 @@
-def rgb(r, g, b):
-    """Convert rgb to hexadecimal value
+def rgb(r: int, g: int, b: int) -> str:
+    """Converts rgb to hexadecimal value.
 
-    Parameters:
-    -----------
-    r : The red value (int)
-
-    g : The green value (int)
-
-    b : The blue value (int)
+    Args:
+        r (int): The red value (0-255)
+        g (int): The green value (0-255)
+        b (int): The blue value (0-255)
 
     Returns:
-    --------
-    hexa : The hexadecimal value (str)
+        str: The hexadecimal value.
     """
+    assert 0 <= r and r <= 255
+    assert 0 <= g and g <= 255
+    assert 0 <= b and b <= 255
     return "#%02x%02x%02x" % (r, g, b)
