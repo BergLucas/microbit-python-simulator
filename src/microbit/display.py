@@ -152,7 +152,7 @@ def is_on() -> bool:
     Returns:
         bool: Whether the display is on
     """
-    __display.is_on()
+    return __display.is_on()
 
 
 def read_light_level() -> int:
