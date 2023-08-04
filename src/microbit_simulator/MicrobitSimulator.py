@@ -4,7 +4,7 @@ from microbit_protocol.commands.microbit import (
 )
 from microbit_protocol.peer import MicrobitPeer, MicrobitWebsocketPeer
 from microbit_protocol.commands import MicrobitCommand
-from microbit_simulator.accelerometer import AccelerometerWidget
+from microbit_simulator.accelerometer import MicrobitAccelerometer
 from microbit_simulator.display import MicrobitDisplay
 from microbit_simulator.button import MicrobitButton, BUTTON_A, BUTTON_B
 from microbit_simulator.utils import rgb
@@ -50,6 +50,7 @@ class MicrobitSimulator(Tk):
             self.__display.peer = peer
             self.__button_a.peer = peer
             self.__button_b.peer = peer
+            self.__accelerometer.peer = peer
             peer.listen()
 
         Thread(target=target, daemon=True).start()
@@ -110,6 +111,15 @@ class MicrobitSimulator(Tk):
             ButtonWidget: The B button of the MicrobitSimulator.
         """
         return self.__button_b
+
+    @property
+    def accelerometer(self) -> MicrobitAccelerometer:
+        """Returns the accelerometer of the MicrobitSimulator.
+
+        Returns:
+            MicrobitAccelerometer: The accelerometer of the MicrobitSimulator.
+        """
+        return self.__accelerometer
 
     @property
     def temperature(self) -> int:
@@ -217,7 +227,7 @@ class MicrobitSimulator(Tk):
     @staticmethod
     def __place_accelerometer(
         master: Misc, x: int, height: int, width: int
-    ) -> AccelerometerWidget:
+    ) -> MicrobitAccelerometer:
         """Places the accelerometer in the center of the window.
 
         Args:
@@ -227,9 +237,9 @@ class MicrobitSimulator(Tk):
             width (int): The width of the window.
 
         Returns:
-            AccelerometerWidget: The accelerometer of the MicrobitSimulator.
+            MicrobitAccelerometer: The accelerometer of the MicrobitSimulator.
         """
-        accelerometer = AccelerometerWidget(master, width, height)
+        accelerometer = MicrobitAccelerometer(master, width, height)
         accelerometer.place(x=x, y=0)
 
         master.update_idletasks()
@@ -255,6 +265,7 @@ class MicrobitSimulator(Tk):
             self.__display.peer = None
             self.__button_a.peer = None
             self.__button_b.peer = None
+            self.__accelerometer.peer = None
 
     def __sync_temperature(self) -> None:
         """Sync the microbit's temperature value."""
