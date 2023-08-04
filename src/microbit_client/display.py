@@ -49,7 +49,7 @@ class Display:
         try:
             self.__pixels[y][x] = value
         except IndexError:
-            raise ValueError("invalid position {x}, {y}")
+            raise ValueError(f"invalid position {x}, {y}")
 
         self.__peer.send_command(MicrobitDisplaySetPixelCommand(x=x, y=y, value=value))
 
