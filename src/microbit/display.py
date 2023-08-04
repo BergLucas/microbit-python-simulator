@@ -1,5 +1,6 @@
 from typing import Union, Iterable, overload
-from microbit import _internal, Image
+from microbit_client.image import Image
+from microbit import _internal
 
 
 def get_pixel(x: int, y: int) -> int:
