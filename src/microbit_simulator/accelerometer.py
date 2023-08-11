@@ -1,27 +1,28 @@
+from tkinter import (
+    Button,
+    Event,
+    Frame,
+    IntVar,
+    Label,
+    Misc,
+    Scale,
+    Spinbox,
+    ttk,
+)
+from tkinter.font import Font
+from typing import Callable, Literal, Optional, Union
+
+from microbit_protocol.commands import MicrobitCommand
 from microbit_protocol.commands.microbit.accelerometer import (
     Gesture,
+    MicrobitAccelerometerCurrentGesture,
     MicrobitAccelerometerGetX,
     MicrobitAccelerometerGetY,
     MicrobitAccelerometerGetZ,
-    MicrobitAccelerometerCurrentGesture,
     MicrobitAccelerometerSetRange,
 )
-from microbit_protocol.exceptions import CommunicationClosed
-from microbit_protocol.commands import MicrobitCommand
+from microbit_protocol.exceptions import CommunicationClosedError
 from microbit_protocol.peer import MicrobitPeer
-from typing import Callable, Union, Literal, Optional
-from tkinter.font import Font
-from tkinter import (
-    Frame,
-    ttk,
-    Scale,
-    Label,
-    Spinbox,
-    Button,
-    IntVar,
-    Misc,
-    Event,
-)
 
 GESTURES_BUTTONS: dict[str, str] = {
     "up": "1",
@@ -49,6 +50,7 @@ JOYSTICK_MODE = True
 
 
 class MicrobitAccelerometer(ttk.Notebook):
+    """An accelerometer widget for the micro:bit accelerometer."""
 
     GESTURES: tuple[Gesture, ...] = (
         "up",
@@ -125,7 +127,7 @@ class MicrobitAccelerometer(ttk.Notebook):
         return self.__max_value
 
     def set_x(self, value: int) -> None:
-        """Set the x value
+        """Set the x value.
 
         Args:
             value (int): The value between -self.max_value and self.max_value
@@ -138,7 +140,7 @@ class MicrobitAccelerometer(ttk.Notebook):
             self.__sync_x()
 
     def get_x(self) -> int:
-        """Get the x value
+        """Get the x value.
 
         Returns:
             int: The x value between -self.max_value and self.max_value
@@ -146,7 +148,7 @@ class MicrobitAccelerometer(ttk.Notebook):
         return self.__x
 
     def set_y(self, value: int) -> None:
-        """Set the y value
+        """Set the y value.
 
         Args:
             value (int): The value between -self.max_value and self.max_value
@@ -159,7 +161,7 @@ class MicrobitAccelerometer(ttk.Notebook):
             self.__sync_y()
 
     def get_y(self):
-        """Get the y value
+        """Get the y value.
 
         Returns:
             int: The y value between -self.max_value and self.max_value
@@ -167,7 +169,7 @@ class MicrobitAccelerometer(ttk.Notebook):
         return self.__y
 
     def set_z(self, value: int) -> None:
-        """Set the z value
+        """Set the z value.
 
         Args:
             value (int): The value between -self.max_value and self.max_value
@@ -180,7 +182,7 @@ class MicrobitAccelerometer(ttk.Notebook):
             self.__sync_z()
 
     def get_z(self) -> int:
-        """Get the z value
+        """Get the z value.
 
         Returns:
             int: The z value between -self.max_value and self.max_value
@@ -188,7 +190,7 @@ class MicrobitAccelerometer(ttk.Notebook):
         return self.__z
 
     def do_gesture(self, gesture: Gesture) -> None:
-        """Do a gesture
+        """Do a gesture.
 
         Args:
             gesture (Gesture): The gesture to do
@@ -197,12 +199,12 @@ class MicrobitAccelerometer(ttk.Notebook):
         self.__sync_current_gesture()
 
     def stop_gesture(self) -> None:
-        """Stop the current gesture"""
+        """Stop the current gesture."""
         self.__current_gesture = ""
         self.__sync_current_gesture()
 
     def current_gesture(self) -> Union[Gesture, Literal[""]]:
-        """Get the current gesture
+        """Get the current gesture.
 
         Returns:
             Union[Gesture, Literal[""]: The current gesture
@@ -264,10 +266,12 @@ class MicrobitAccelerometer(ttk.Notebook):
             master (Misc): The master widget.
             width (int): The width of the widget.
             name (str): The name of the slider.
-            value_callback (Callable[[int], None]): The callback function to call when the slider is changed.
+            value_callback (Callable[[int], None]): The callback function
+                to call when the slider is changed.
 
         Returns:
-            tuple[Frame, Spinbox, Scale]: The slider frame, the slider spinbox and the slider.
+            tuple[Frame, Spinbox, Scale]: The slider frame,
+                the slider spinbox and the slider.
         """
         slider_frame = Frame(master, width=width, bg="")
         slider_frame.rowconfigure(2, weight=1)
@@ -326,10 +330,10 @@ class MicrobitAccelerometer(ttk.Notebook):
         gestures_frame.place()
         self.add(gestures_frame, text="Gestures")
 
-        def getCallback(gesture: Gesture) -> Callable[[], None]:
+        def get_callback(gesture: Gesture) -> Callable[[], None]:
             return lambda: self.do_gesture(gesture)
 
-        def getCommand(gesture: Gesture) -> Callable[[Event], None]:
+        def get_command(gesture: Gesture) -> Callable[[Event], None]:
             return lambda _: self.do_gesture(gesture)
 
         gesture_id = 0
@@ -342,10 +346,10 @@ class MicrobitAccelerometer(ttk.Notebook):
                 gesture_id // 2,
                 gesture_id % 2,
                 gesture,
-                getCallback(gesture),
+                get_callback(gesture),
             )
             if (gesture_button := GESTURES_BUTTONS.get(gesture)) is not None:
-                self.bind_all(f"<KeyPress-{gesture_button}>", getCommand(gesture))
+                self.bind_all(f"<KeyPress-{gesture_button}>", get_command(gesture))
                 self.bind_all(
                     f"<KeyRelease-{gesture_button}>",
                     lambda _: self.stop_gesture(),
@@ -362,7 +366,7 @@ class MicrobitAccelerometer(ttk.Notebook):
         )
 
     @staticmethod
-    def __add_gesture(
+    def __add_gesture(  # noqa: PLR0913
         master: Misc,
         width: int,
         height: int,
@@ -380,7 +384,8 @@ class MicrobitAccelerometer(ttk.Notebook):
             row (int): The row of the widget.
             column (int): The column of the widget.
             name (str): The name of the gesture.
-            value_callback (Callable[[], None]): The callback function to call when the gesture is done.
+            value_callback (Callable[[], None]): The callback function
+                to call when the gesture is done.
         """
         gesture_button = Button(
             master,
@@ -425,7 +430,7 @@ class MicrobitAccelerometer(ttk.Notebook):
         if self.__peer is not None:
             try:
                 self.__peer.send_command(MicrobitAccelerometerGetX(x=self.__x))
-            except CommunicationClosed:
+            except CommunicationClosedError:
                 self.__peer = None
 
     def __sync_y(self) -> None:
@@ -433,7 +438,7 @@ class MicrobitAccelerometer(ttk.Notebook):
         if self.__peer is not None:
             try:
                 self.__peer.send_command(MicrobitAccelerometerGetY(y=self.__y))
-            except CommunicationClosed:
+            except CommunicationClosedError:
                 self.__peer = None
 
     def __sync_z(self) -> None:
@@ -441,7 +446,7 @@ class MicrobitAccelerometer(ttk.Notebook):
         if self.__peer is not None:
             try:
                 self.__peer.send_command(MicrobitAccelerometerGetZ(z=self.__z))
-            except CommunicationClosed:
+            except CommunicationClosedError:
                 self.__peer = None
 
     def __sync_current_gesture(self) -> None:
@@ -453,5 +458,5 @@ class MicrobitAccelerometer(ttk.Notebook):
                         current_gesture=self.__current_gesture
                     )
                 )
-            except CommunicationClosed:
+            except CommunicationClosedError:
                 self.__peer = None

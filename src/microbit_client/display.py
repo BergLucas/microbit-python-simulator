@@ -1,21 +1,36 @@
-from microbit_protocol.commands.microbit.display import (
-    MicrobitDisplaySetPixelCommand,
-    MicrobitDisplayClearCommand,
-    MicrobitDisplayShowCommand,
-    MicrobitDisplayOnCommand,
-    MicrobitDisplayOffCommand,
-    MicrobitDisplayReadLightLevelCommand,
-)
-from microbit_protocol.commands import MicrobitCommand
-from microbit_protocol.peer import MicrobitPeer
-from microbit_client.image import Image
-from typing import Union, Iterable
 from threading import Thread
 from time import sleep
+from typing import Iterable, Union
+
+from microbit_protocol.commands import MicrobitCommand
+from microbit_protocol.commands.microbit.display import (
+    DISPLAY_MAX_X,
+    DISPLAY_MAX_Y,
+    DISPLAY_MIN_X,
+    DISPLAY_MIN_Y,
+    LED_MAX_VALUE,
+    LED_MIN_VALUE,
+    MicrobitDisplayClearCommand,
+    MicrobitDisplayOffCommand,
+    MicrobitDisplayOnCommand,
+    MicrobitDisplayReadLightLevelCommand,
+    MicrobitDisplaySetPixelCommand,
+    MicrobitDisplayShowCommand,
+)
+from microbit_protocol.peer import MicrobitPeer
+
+from microbit_client.image import Image
 
 
 class Display:
+    """Represents a micro:bit's display client."""
+
     def __init__(self, peer: MicrobitPeer) -> None:
+        """Initialises `self` to a new Display instance.
+
+        Args:
+            peer (MicrobitPeer): The peer to communicate with.
+        """
         self.__peer = peer
         self.__light_level = 0
         self.on()
@@ -28,25 +43,55 @@ class Display:
         peer.add_listener(listener)
 
     def get_pixel(self, x: int, y: int) -> int:
+        """Gets the brightness of the LED at the given position.
+
+        Args:
+            x (int): The x position of the LED.
+            y (int): The y position of the LED.
+
+        Returns:
+            int: The brightness of the LED.
+        """
         assert isinstance(x, int), f"x must be an int, not {type(x).__name__}"
         assert isinstance(y, int), f"y must be an int, not {type(y).__name__}"
 
-        if x < 0 or 4 < x or y < 0 or 4 < y:
+        if (
+            x < DISPLAY_MIN_X
+            or DISPLAY_MAX_X < x
+            or y < DISPLAY_MIN_Y
+            or DISPLAY_MAX_Y < y
+        ):
             raise ValueError(f"invalid position {x}, {y}")
 
         return self.__pixels[y][x]
 
     def set_pixel(self, x: int, y: int, value: int) -> None:
+        """Sets the brightness of the LED at the given position.
+
+        Args:
+            x (int): The x position of the LED.
+            y (int): The y position of the LED.
+            value (int): The brightness of the LED.
+
+        Raises:
+            ValueError: If `value` is not between 0 and 9 inclusive.
+            ValueError: If `x` or `y` are not between 0 and 4 inclusive.
+        """
         assert isinstance(x, int), f"x must be an int, not {type(x).__name__}"
         assert isinstance(y, int), f"y must be an int, not {type(y).__name__}"
         assert isinstance(
             value, int
         ), f"value must be an int, not {type(value).__name__}"
 
-        if value < 0 or 9 < value:
+        if value < LED_MIN_VALUE or LED_MAX_VALUE < value:
             raise ValueError("brightness out of bounds")
 
-        if x < 0 or 4 < x or y < 0 or 4 < y:
+        if (
+            x < DISPLAY_MIN_X
+            or DISPLAY_MAX_X < x
+            or y < DISPLAY_MIN_Y
+            or DISPLAY_MAX_Y < y
+        ):
             raise ValueError(f"invalid position {x}, {y}")
 
         self.__pixels[y][x] = value
@@ -58,7 +103,7 @@ class Display:
         self.__pixels = [[0 for _ in range(5)] for _ in range(5)]
         self.__peer.send_command(MicrobitDisplayClearCommand())
 
-    def show(
+    def show(  # noqa: PLR0913
         self,
         image: Union[Image, str, float, int, Iterable[Image]],
         delay: int = 400,
@@ -67,13 +112,31 @@ class Display:
         loop: bool = False,
         clear: bool = False,
     ) -> None:
+        """Displays an image on the micro:bit's display.
+
+        Args:
+            image (Union[Image, str, float, int, Iterable[Image]]): The image
+                to display.
+            delay (int, optional): The delay between each frame in milliseconds.
+                Defaults to 400.
+            wait (bool, optional): Whether to wait for the animation to finish.
+                Defaults to True.
+            loop (bool, optional): Whether to loop the animation.
+                Defaults to False.
+            clear (bool, optional): Whether to clear the display after the animation.
+                Defaults to False.
+
+        Raises:
+            ValueError: If `delay` is negative.
+        """
         if isinstance(image, Image):
             self.__send_image(image)
             return
 
-        assert isinstance(
-            image, (str, float, int, Iterable)
-        ), f"image must be a str, float, int or Iterable[Image], got {type(image).__name__}"
+        assert isinstance(image, (str, float, int, Iterable)), (
+            "image must be a str, float, int or Iterable[Image],"
+            f"got {type(image).__name__}"
+        )
         assert isinstance(
             delay, int
         ), f"delay must be an int, not {type(delay).__name__}"
@@ -107,7 +170,7 @@ class Display:
         if clear:
             self.clear()
 
-    def scroll(
+    def scroll(  # noqa: PLR0913
         self,
         text: Union[str, int, float],
         delay: int = 150,
@@ -116,6 +179,22 @@ class Display:
         loop: bool = False,
         monospace: bool = False,
     ) -> None:
+        """Scrolls text across the micro:bit's display.
+
+        Args:
+            text (Union[str, int, float]): The text to scroll.
+            delay (int, optional): The delay between each frame in milliseconds.
+                Defaults to 150.
+            wait (bool, optional): Whether to wait for the animation to finish.
+                Defaults to True.
+            loop (bool, optional): Whether to loop the animation.
+                Defaults to False.
+            monospace (bool, optional): Whether to use monospace font.
+                Defaults to False.
+
+        Raises:
+            ValueError: If `delay` is negative.
+        """
         assert isinstance(
             text, (str, int, float)
         ), f"text must be a str, int or float, not {type(text).__name__}"
@@ -150,30 +229,59 @@ class Display:
             Thread(target=target, daemon=True).start()
 
     def on(self) -> None:
+        """Turns the display on."""
         self.__is_on = True
         self.__peer.send_command(MicrobitDisplayOnCommand())
 
     def off(self) -> None:
+        """Turns the display off."""
         self.__is_on = False
         self.__peer.send_command(MicrobitDisplayOffCommand())
 
     def is_on(self) -> bool:
+        """Returns whether the display is on.
+
+        Returns:
+            bool: Whether the display is on.
+        """
         return self.__is_on
 
     def read_light_level(self) -> int:
+        """Reads the light level from the display.
+
+        Returns:
+            int: The light level.
+        """
         return self.__light_level
 
     def __scroll_image(self, image: Image, delay: int) -> None:
+        """Scrolls an image across the display.
+
+        Args:
+            image (Image): The image to scroll.
+            delay (int): The delay between each frame in milliseconds.
+        """
         for i in range(image.width() + 1):
             self.__send_image(image.crop(i, 0, 5, 5))
             sleep(delay / 1000)
 
     def __send_images(self, images: Iterable[Image], delay: int) -> None:
+        """Sends images to the display.
+
+        Args:
+            images (Iterable[Image]): The images to send.
+            delay (int): The delay between each frame in milliseconds.
+        """
         for image in images:
             self.__send_image(image)
             sleep(delay / 1000)
 
     def __send_image(self, image: Image) -> None:
+        """Sends an image to the display.
+
+        Args:
+            image (Image): The image to send.
+        """
         self.__peer.send_command(
             MicrobitDisplayShowCommand(
                 image=[

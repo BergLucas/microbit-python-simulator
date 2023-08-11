@@ -1,15 +1,19 @@
-from microbit_protocol.commands.microbit import MicrobitButtonIsPressedCommand
-from microbit_protocol.exceptions import CommunicationClosed
-from microbit_protocol.peer import MicrobitPeer
-from microbit_simulator.utils import rgb
-from typing import Optional, Literal
 from tkinter import Canvas, Misc
+from typing import Literal, Optional
+
+from microbit_protocol.commands.microbit import MicrobitButtonIsPressedCommand
+from microbit_protocol.exceptions import CommunicationClosedError
+from microbit_protocol.peer import MicrobitPeer
+
+from microbit_simulator.utils import rgb
 
 BUTTON_A = "a"
 BUTTON_B = "b"
 
 
 class MicrobitButton(Canvas):
+    """A button widget for the micro:bit."""
+
     def __init__(
         self,
         master: Misc,
@@ -70,7 +74,7 @@ class MicrobitButton(Canvas):
         self.__peer = value
 
     def press(self) -> None:
-        """Press the button"""
+        """Press the button."""
         was_pressed = self.__is_pressed
 
         self.__is_pressed = True
@@ -80,7 +84,7 @@ class MicrobitButton(Canvas):
             self.__sync_is_pressed()
 
     def release(self) -> None:
-        """Release the button"""
+        """Release the button."""
         was_pressed = self.__is_pressed
 
         self.__is_pressed = False
@@ -107,5 +111,5 @@ class MicrobitButton(Canvas):
                         is_pressed=self.__is_pressed,
                     )
                 )
-            except CommunicationClosed:
+            except CommunicationClosedError:
                 self.__peer = None

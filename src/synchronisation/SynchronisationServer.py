@@ -1,16 +1,15 @@
-from .AddressesLinker import AddressesLinker, Address, checkAddress
-from .ConnectionServer import ConnectionServer
+import json
+from threading import Thread
+
+from .AddressesLinker import Address, AddressesLinker, checkAddress
 from .Connection import Connection
+from .ConnectionServer import ConnectionServer
 from .Order import Order
-from typing import Dict, List, Tuple, Union
-from threading import Lock, Thread
-from time import sleep
-import socket, json
 
 
 class SynchronisationServer:
     def __init__(self, synchronisation_port: int, debug: bool = False):
-        """Create a Synchronisation server
+        """Create a Synchronisation server.
 
         Parameters:
         -----------
@@ -34,7 +33,7 @@ class SynchronisationServer:
         self.__addressesLinker = AddressesLinker()
 
     def start(self):
-        """Start the synchronisation and the data transfert
+        """Start the synchronisation and the data transfert.
 
         Raises:
         -------
@@ -47,14 +46,14 @@ class SynchronisationServer:
         Thread(target=self.__acceptSyncConnection, daemon=True).start()
 
     def stop(self):
-        """Stop the synchronisation and the data transfert"""
+        """Stop the synchronisation and the data transfert."""
         if not self.__on:
             return
         self.__on = False
         self.__sync_server.close()
 
     def isRunning(self) -> bool:
-        """Check if the server is running
+        """Check if the server is running.
 
         Returns:
         --------
@@ -88,7 +87,7 @@ class SynchronisationServer:
                     print(f"SynchronisationServer : __acceptSyncConnection - {e}")
 
     def __modifyLinker(self, addr: Address, connection: Connection):
-        """Receive order from a SynchronisationClient until the connection is lost
+        """Receive order from a SynchronisationClient until the connection is lost.
 
         Parameters:
         -----------

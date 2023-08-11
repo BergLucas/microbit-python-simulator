@@ -1,12 +1,19 @@
 from __future__ import annotations
-from typing import overload, Union, Callable
-from functools import cache
+
 import re
+from functools import cache
+from typing import Callable, Union, overload
+
+from microbit_protocol.commands.microbit.display import LED_MAX_VALUE, LED_MIN_VALUE
+
+IMAGE_MIN_ARGS_NB = 0
+IMAGE_MAX_ARGS_NB = 3
 
 
 class Image:
-    """
-    The `Image` class is used to create images that can be displayed easily on the device's LED matrix.
+    """The `Image` class is used to create images.
+
+    These images can be displayed easily on the device's LED matrix.
 
     Given an image object it's possible to display it via the `display` API:
 
@@ -21,9 +28,12 @@ class Image:
 
     @overload
     def __init__(self, string: str) -> None:
-        """Create an image by parsing the string, a single character returns that glyph.
+        r"""Create an image by parsing the string.
 
-        The `string` argument has to consist of digits 0-9 arranged into lines, describing the image, for example:
+        If there is only a single character, then it returns that glyph.
+
+        The `string` argument has to consist of digits 0-9 arranged into lines,
+        describing the image, for example:
 
         ```python
         image = Image("90009:"
@@ -33,7 +43,8 @@ class Image:
                       "90009")
         ```
 
-        will create a 5x5 image of an X. The end of a line is indicated by a colon. It's also possible to use a newline (n) to indicate the end of a line like this:
+        will create a 5x5 image of an X. The end of a line is indicated by a colon.
+        It's also possible to use a newline (n) to indicate the end of a line like this:
 
         ```python
         image = Image("90009\\n"
@@ -66,10 +77,11 @@ class Image:
     def __init__(
         self, width: int, height: int, buffer: Union[bytes, bytearray]
     ) -> None:
-        """Create an image from the given buffer.
+        r"""Create an image from the given buffer.
 
         This form creates an empty image with `width` columns and `height` rows.
-        `buffer` is an array of `width x height` integers in range 0-9 to initialize the image:
+        `buffer` is an array of `width x height` integers in range 0-9 to
+        initialize the image:
 
         ```python
         Image(2, 2, b'\\x08\\x08\\x08\\x08')
@@ -105,7 +117,7 @@ class Image:
         """
         assert not kwargs, "Image() does not take keyword arguments"
         assert (
-            0 <= len(args) and len(args) <= 3
+            IMAGE_MIN_ARGS_NB <= len(args) and len(args) <= IMAGE_MAX_ARGS_NB
         ), f"Image() expected at most 3 arguments, got {len(args)}"
 
         if len(args) == 1:
@@ -116,7 +128,7 @@ class Image:
             self.__init_from_string(string)
             return
 
-        if len(args) == 0:
+        if len(args) == IMAGE_MIN_ARGS_NB:
             width = 5
             height = 5
         else:
@@ -129,7 +141,7 @@ class Image:
                 height, int
             ), f"height must be an int, not {type(width).__name__}"
 
-        if len(args) < 3:
+        if len(args) < IMAGE_MAX_ARGS_NB:
             self.__init_from_size(width, height)
         else:
             buffer = args[2]
@@ -215,7 +227,7 @@ class Image:
             for x in range(width):
                 value = buffer[x + y * width]
 
-                if value < 0 or value > 9:
+                if value < LED_MIN_VALUE or value > LED_MAX_VALUE:
                     raise ValueError(f"Bytes value {value} out of range 0-9")
 
                 self.__pixels[y][x] = value
@@ -237,9 +249,12 @@ class Image:
         return self.__height
 
     def set_pixel(self, x: int, y: int, value: int) -> None:
-        """Set the brightness of the pixel at column `x` and row `y` to the `value`, which has to be between 0 (dark) and 9 (bright).
+        """Set the brightness of the pixel at column `x` and row `y` to the `value`.
 
-        This method will raise an exception when called on any of the built-in read-only images, like `Image.HEART`.
+        The value has to be between 0 (dark) and 9 (bright).
+
+        This method will raise an exception when called on any of
+        the built-in read-only images, like `Image.HEART`.
 
         Args:
             x (int): The x position of the pixel
@@ -259,7 +274,7 @@ class Image:
 
         if self.__readonly:
             raise TypeError("Image cannot be modified (try copying first)")
-        if value < 0 or 9 < value:
+        if value < LED_MIN_VALUE or LED_MAX_VALUE < value:
             raise ValueError("brightness out of bounds")
 
         if x < 0 or x >= self.__width or y < 0 or y >= self.__height:
@@ -268,7 +283,9 @@ class Image:
         self.__pixels[y][x] = value
 
     def get_pixel(self, x: int, y: int) -> int:
-        """Return the brightness of pixel at column `x` and row `y` as an integer between 0 and 9.
+        """Return the brightness of pixel at column `x` and row `y`.
+
+        The brightness is an integer between 0 and 9.
 
         Args:
             x (int): The x position of the pixel
@@ -345,7 +362,10 @@ class Image:
         return self.shift_up(-n)
 
     def crop(self, x: int, y: int, w: int, h: int) -> Image:
-        """Return a new image by cropping the picture to a width of `w` and a height of `h`, starting with the pixel at column `x` and row `y`.
+        """Return a new image by cropping the picture.
+
+        It crops to a width of `w` and a height of `h`, starting with the pixel
+        at column `x` and row `y`.
 
         Args:
             x (int): The x position of the pixel
@@ -375,7 +395,7 @@ class Image:
         return image
 
     def invert(self) -> Image:
-        """Return a new image by inverting the brightness of the pixels in the source image.
+        """Return a new image by inverting the brightness of the pixels in the image.
 
         Returns:
             Image : The inverted image
@@ -387,9 +407,12 @@ class Image:
         return image
 
     def fill(self, value: int):
-        """Set the brightness of all the pixels in the image to the value, which has to be between 0 (dark) and 9 (bright).
+        """Set the brightness of all the pixels in the image to the value.
 
-        This method will raise an exception when called on any of the built-in read-only images, like Image.HEART.
+        The value has to be between 0 (dark) and 9 (bright).
+
+        This method will raise an exception when called on any of
+        the built-in read-only images, like Image.HEART.
 
         Args:
             value (int): The brightness of the pixel
@@ -404,21 +427,25 @@ class Image:
 
         if self.__readonly:
             raise TypeError("Image cannot be modified (try copying first)")
-        if value < 0 or 9 < value:
+        if value < LED_MIN_VALUE or LED_MAX_VALUE < value:
             raise ValueError("brightness out of bounds")
 
         for y in range(self.__height):
             for x in range(self.__width):
                 self.__pixels[y][x] = value
 
-    def blit(
+    def blit(  # noqa: PLR0913
         self, src: Image, x: int, y: int, w: int, h: int, xdest: int = 0, ydest: int = 0
     ) -> None:
-        """Copy the rectangle defined by `x`, `y`, `w`, `h` from the image `src` into this image at `xdest`, `ydest`.
+        """Copy the rectangle defined by `x`, `y`, `w`, `h` from the image `src`.
 
-        Areas in the source rectangle, but outside the source image are treated as having a value of 0.
+        It copies the rectangle into this image at `xdest`, `ydest`.
 
-        shift_left(), shift_right(), shift_up(), shift_down() and crop() can are all implemented by using blit().
+        Areas in the source rectangle, but outside the source image are treated
+        as having a value of 0.
+
+        shift_left(), shift_right(), shift_up(), shift_down() and crop() can are all
+        implemented by using blit().
         For example, img.crop(x, y, w, h) can be implemented as:
 
         ```python
@@ -434,8 +461,10 @@ class Image:
             y (int): The y position of the source rectangle
             w (int): The width of the source rectangle
             h (int): The height of the source rectangle
-            xdest (int, optional): The x position of the destination rectangle. Defaults to 0.
-            ydest (int, optional): The y position of the destination rectangle. Defaults to 0.
+            xdest (int, optional): The x position of the destination rectangle.
+                Defaults to 0.
+            ydest (int, optional): The y position of the destination rectangle.
+                Defaults to 0.
 
         """
         assert isinstance(src, Image), f"src must be an Image, not {type(src).__name__}"
@@ -467,7 +496,8 @@ class Image:
 
         Args:
             image (Image): The image to merge with
-            merge_function (Callable[[int, int], int]): The function `(pixel1, pixel2) -> result` to merge the pixels with
+            merge_function (Callable[[int, int], int]): The function
+                `(pixel1, pixel2) -> result` to merge the pixels with
 
         Raises:
             ValueError: if the images are not the same size
@@ -495,7 +525,8 @@ class Image:
 
         Args:
             value (Union[int, float]): The number to merge with
-            merge_function (Callable[[int, Union[int, float]], int]): The function `(pixel, value) -> result` to merge the pixels with
+            merge_function (Callable[[int, Union[int, float]], int]): The function
+                `(pixel, value) -> result` to merge the pixels with
 
         Raises:
             ValueError: if value is negative
@@ -503,7 +534,7 @@ class Image:
         Returns:
             Image: The merged image
         """
-        if value < 0:
+        if value < LED_MIN_VALUE:
             raise ValueError("brightness multiplier must not be negative")
 
         image = Image(self.__width, self.__height)
@@ -512,7 +543,12 @@ class Image:
                 image.__pixels[y][x] = merge_function(self.__pixels[y][x], value)
         return image
 
-    def __repr__(self):
+    def __repr__(self) -> str:
+        """Get a compact string representation of the image.
+
+        Returns:
+            str: A compact string representation of the image.
+        """
         return (
             "Image('"
             + str.join(
@@ -527,7 +563,12 @@ class Image:
             + ":')"
         )
 
-    def __str__(self):
+    def __str__(self) -> str:
+        """Get a readable string representation of the image.
+
+        Returns:
+            str: A readable string representation of the image.
+        """
         return (
             "Image(\n    '"
             + str.join(
@@ -543,6 +584,16 @@ class Image:
         )
 
     def __add__(self, image: Image) -> Image:
+        """Create a new image by adding the brightness values from the two images.
+
+        It adds the images pixel by pixel, clamping the result to 9.
+
+        Args:
+            image (Image): The image to add
+
+        Returns:
+            Image: The new image
+        """
         assert isinstance(
             image, Image
         ), f"Unsupported operand type(s) for +: Image and {type(image).__name__}"
@@ -553,6 +604,16 @@ class Image:
         )
 
     def __sub__(self, image: Image) -> Image:
+        """Create a new image by subtracting the brightness values from the two images.
+
+        It subtracts the images pixel by pixel, clamping the result to 0.
+
+        Args:
+            image (Image): The image to add
+
+        Returns:
+            Image: The new image
+        """
         assert isinstance(
             image, Image
         ), f"Unsupported operand type(s) for -: Image and {type(image).__name__}"
@@ -563,6 +624,19 @@ class Image:
         )
 
     def __mul__(self, value: Union[int, float]) -> Image:
+        """Create a new image by multiplying the brightness of each pixel by ``n``.
+
+        It multiplies the image pixel by pixel, clamping the result to 9.
+
+        Args:
+            value (Union[int, float]): The number to multiply by
+
+        Raises:
+            ValueError: if value is negative
+
+        Returns:
+            Image: The new image
+        """
         assert isinstance(
             value, (int, float)
         ), f"Unsupported operand type(s) for *: Image and {type(value).__name__}"
@@ -573,6 +647,19 @@ class Image:
         )
 
     def __truediv__(self, value: Union[int, float]) -> Image:
+        """Create a new image by dividing the brightness of each pixel by ``n``.
+
+        It divides the image pixel by pixel, clamping the result to 9.
+
+        Args:
+            value (Union[int, float]): The number to divide by
+
+        Raises:
+            ValueError: if value is negative
+
+        Returns:
+            Image: The new image
+        """
         assert isinstance(
             value, (int, float)
         ), f"Unsupported operand type(s) for /: Image and {type(value).__name__}"
@@ -701,163 +788,163 @@ class Image:
     @classmethod
     @property
     @cache
-    def HEART(cls) -> Image:
+    def HEART(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("09090:99999:99999:09990:00900")
 
     @classmethod
     @property
     @cache
-    def HEART_SMALL(cls) -> Image:
+    def HEART_SMALL(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00000:09090:09990:00900:00000")
 
     @classmethod
     @property
     @cache
-    def HAPPY(cls) -> Image:
+    def HAPPY(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00000:09090:00000:90009:09990")
 
     @classmethod
     @property
     @cache
-    def SMILE(cls) -> Image:
+    def SMILE(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00000:00000:00000:90009:09990")
 
     @classmethod
     @property
     @cache
-    def SAD(cls) -> Image:
+    def SAD(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00000:09090:00000:09990:90009")
 
     @classmethod
     @property
     @cache
-    def CONFUSED(cls) -> Image:
+    def CONFUSED(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00000:09090:00000:09090:90909")
 
     @classmethod
     @property
     @cache
-    def ANGRY(cls) -> Image:
+    def ANGRY(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("90009:09090:00000:99999:90909")
 
     @classmethod
     @property
     @cache
-    def ASLEEP(cls) -> Image:
+    def ASLEEP(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00000:99099:00000:09990:00000")
 
     @classmethod
     @property
     @cache
-    def SURPRISED(cls) -> Image:
+    def SURPRISED(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("09090:00000:00900:09090:00900")
 
     @classmethod
     @property
     @cache
-    def SILLY(cls) -> Image:
+    def SILLY(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("90009:00000:99999:00099:00099")
 
     @classmethod
     @property
     @cache
-    def FABULOUS(cls) -> Image:
+    def FABULOUS(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("99999:99099:00000:09090:09990")
 
     @classmethod
     @property
     @cache
-    def MEH(cls) -> Image:
+    def MEH(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("99099:00000:00090:00900:09000")
 
     @classmethod
     @property
     @cache
-    def YES(cls) -> Image:
+    def YES(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00000:00009:00090:90900:09000")
 
     @classmethod
     @property
     @cache
-    def NO(cls) -> Image:
+    def NO(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("90009:09090:00900:09090:90009")
 
     @classmethod
     @property
     @cache
-    def CLOCK12(cls) -> Image:
+    def CLOCK12(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00900:00900:00900:00000:00000")
 
     @classmethod
     @property
     @cache
-    def CLOCK11(cls) -> Image:
+    def CLOCK11(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("09000:09900:00900:00000:00000")
 
     @classmethod
     @property
     @cache
-    def CLOCK10(cls) -> Image:
+    def CLOCK10(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00000:99000:09900:00000:00000")
 
     @classmethod
     @property
     @cache
-    def CLOCK9(cls) -> Image:
+    def CLOCK9(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00000:00000:99900:00000:00000")
 
     @classmethod
     @property
     @cache
-    def CLOCK8(cls) -> Image:
+    def CLOCK8(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00000:00000:09900:99000:00000")
 
     @classmethod
     @property
     @cache
-    def CLOCK7(cls) -> Image:
+    def CLOCK7(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00000:00000:00900:09900:09000")
 
     @classmethod
     @property
     @cache
-    def CLOCK6(cls) -> Image:
+    def CLOCK6(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00000:00000:00900:00900:00900")
 
     @classmethod
     @property
     @cache
-    def CLOCK5(cls) -> Image:
+    def CLOCK5(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00000:00000:00900:00990:00090")
 
     @classmethod
     @property
     @cache
-    def CLOCK4(cls) -> Image:
+    def CLOCK4(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00000:00000:00990:00099:00000")
 
     @classmethod
     @property
     @cache
-    def CLOCK3(cls) -> Image:
+    def CLOCK3(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00000:00000:00999:00000:00000")
 
     @classmethod
     @property
     @cache
-    def CLOCK2(cls) -> Image:
+    def CLOCK2(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00000:00099:00990:00000:00000")
 
     @classmethod
     @property
     @cache
-    def CLOCK1(cls) -> Image:
+    def CLOCK1(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00090:00990:00900:00000:00000")
 
     @classmethod
     @property
     @cache
-    def ALL_CLOCKS(cls) -> tuple[Image, ...]:
+    def ALL_CLOCKS(cls) -> tuple[Image, ...]:  # noqa: N802, D102
         return (
             cls.CLOCK1,
             cls.CLOCK2,
@@ -876,55 +963,55 @@ class Image:
     @classmethod
     @property
     @cache
-    def ARROW_N(cls) -> Image:
+    def ARROW_N(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00900:09990:90909:00900:00900")
 
     @classmethod
     @property
     @cache
-    def ARROW_NE(cls) -> Image:
+    def ARROW_NE(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00999:00099:00909:09000:90000")
 
     @classmethod
     @property
     @cache
-    def ARROW_E(cls) -> Image:
+    def ARROW_E(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00900:00090:99999:00090:00900")
 
     @classmethod
     @property
     @cache
-    def ARROW_SE(cls) -> Image:
+    def ARROW_SE(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("90000:09000:00909:00099:00999")
 
     @classmethod
     @property
     @cache
-    def ARROW_S(cls) -> Image:
+    def ARROW_S(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00900:00900:90909:09990:00900")
 
     @classmethod
     @property
     @cache
-    def ARROW_SW(cls) -> Image:
+    def ARROW_SW(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00009:00090:90900:99000:99900")
 
     @classmethod
     @property
     @cache
-    def ARROW_W(cls) -> Image:
+    def ARROW_W(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00900:09000:99999:09000:00900")
 
     @classmethod
     @property
     @cache
-    def ARROW_NW(cls) -> Image:
+    def ARROW_NW(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("99900:99000:90900:00090:00009")
 
     @classmethod
     @property
     @cache
-    def ALL_ARROWS(cls) -> tuple[Image, ...]:
+    def ALL_ARROWS(cls) -> tuple[Image, ...]:  # noqa: N802, D102
         return (
             cls.ARROW_N,
             cls.ARROW_NE,
@@ -939,173 +1026,173 @@ class Image:
     @classmethod
     @property
     @cache
-    def TRIANGLE(cls) -> Image:
+    def TRIANGLE(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("99999:00900:09090:99999:00000")
 
     @classmethod
     @property
     @cache
-    def TRIANGLE_LEFT(cls) -> Image:
+    def TRIANGLE_LEFT(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("90000:99000:90900:90090:99999")
 
     @classmethod
     @property
     @cache
-    def CHESSBOARD(cls) -> Image:
+    def CHESSBOARD(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("09090:90909:09090:90909:09090")
 
     @classmethod
     @property
     @cache
-    def DIAMOND(cls) -> Image:
+    def DIAMOND(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00900:09090:90009:09090:00900")
 
     @classmethod
     @property
     @cache
-    def DIAMOND_SMALL(cls) -> Image:
+    def DIAMOND_SMALL(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00000:00900:09090:00900:00000")
 
     @classmethod
     @property
     @cache
-    def SQUARE(cls) -> Image:
+    def SQUARE(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("99999:90009:90009:90009:99999")
 
     @classmethod
     @property
     @cache
-    def SQUARE_SMALL(cls) -> Image:
+    def SQUARE_SMALL(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00000:09990:09090:09990:00000")
 
     @classmethod
     @property
     @cache
-    def RABBIT(cls) -> Image:
+    def RABBIT(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("90900:90900:99990:99090:99990")
 
     @classmethod
     @property
     @cache
-    def COW(cls) -> Image:
+    def COW(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("90009:90009:99999:09990:00900")
 
     @classmethod
     @property
     @cache
-    def MUSIC_CROTCHET(cls) -> Image:
+    def MUSIC_CROTCHET(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00900:00900:00900:99900:99900")
 
     @classmethod
     @property
     @cache
-    def MUSIC_QUAVER(cls) -> Image:
+    def MUSIC_QUAVER(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00900:00990:00909:99900:99900")
 
     @classmethod
     @property
     @cache
-    def MUSIC_QUAVERS(cls) -> Image:
+    def MUSIC_QUAVERS(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("09999:09009:09009:99099:99099")
 
     @classmethod
     @property
     @cache
-    def PITCHFORK(cls) -> Image:
+    def PITCHFORK(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("90909:90909:99999:00900:00900")
 
     @classmethod
     @property
     @cache
-    def XMAS(cls) -> Image:
+    def XMAS(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00900:09990:00900:09990:99999")
 
     @classmethod
     @property
     @cache
-    def PACMAN(cls) -> Image:
+    def PACMAN(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("09999:99090:99900:99990:09999")
 
     @classmethod
     @property
     @cache
-    def TARGET(cls) -> Image:
+    def TARGET(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00900:09990:99099:09990:00900")
 
     @classmethod
     @property
     @cache
-    def TSHIRT(cls) -> Image:
+    def TSHIRT(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("99099:99999:09990:09990:09990")
 
     @classmethod
     @property
     @cache
-    def ROLLERSKATE(cls) -> Image:
+    def ROLLERSKATE(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00099:00099:99999:99999:09090")
 
     @classmethod
     @property
     @cache
-    def DUCK(cls) -> Image:
+    def DUCK(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("09900:99900:09999:09990:00000")
 
     @classmethod
     @property
     @cache
-    def HOUSE(cls) -> Image:
+    def HOUSE(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00900:09990:99999:09990:09090")
 
     @classmethod
     @property
     @cache
-    def TORTOISE(cls) -> Image:
+    def TORTOISE(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00000:09990:99999:09090:00000")
 
     @classmethod
     @property
     @cache
-    def BUTTERFLY(cls) -> Image:
+    def BUTTERFLY(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("99099:99999:00900:99999:99099")
 
     @classmethod
     @property
     @cache
-    def STICKFIGURE(cls) -> Image:
+    def STICKFIGURE(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00900:99999:00900:09090:90009")
 
     @classmethod
     @property
     @cache
-    def GHOST(cls) -> Image:
+    def GHOST(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("09990:90909:99999:99999:90909")
 
     @classmethod
     @property
     @cache
-    def SWORD(cls) -> Image:
+    def SWORD(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00900:00900:00900:09990:00900")
 
     @classmethod
     @property
     @cache
-    def GIRAFFE(cls) -> Image:
+    def GIRAFFE(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("99000:09000:09000:09990:09090")
 
     @classmethod
     @property
     @cache
-    def SKULL(cls) -> Image:
+    def SKULL(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("09990:90909:99999:09990:09990")
 
     @classmethod
     @property
     @cache
-    def UMBRELLA(cls) -> Image:
+    def UMBRELLA(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("09990:99999:00900:90900:99900")
 
     @classmethod
     @property
     @cache
-    def SNAKE(cls) -> Image:
+    def SNAKE(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("99000:99099:09090:09990:00000")

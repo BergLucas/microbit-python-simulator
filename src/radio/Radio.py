@@ -1,9 +1,10 @@
-from synchronisation import *
-from typing import Dict, Tuple, Union, List
+import socket
 from queue import Queue
-from threading import Thread, Lock
+from threading import Lock, Thread
 from time import sleep, time
-import socket, json
+from typing import Dict, Tuple, Union
+
+from synchronisation import *
 
 RATE_250KBIT = 250
 RATE_1MBIT = 1000
@@ -20,7 +21,7 @@ class Radio:
         timeout: int = None,
         debug: bool = False,
     ):
-        """Create a radio
+        """Create a radio.
 
         Parameters:
         -----------
@@ -57,7 +58,7 @@ class Radio:
         self.__debug = debug
         # Check values
         if interval < 0:
-            raise ValueError(f"invalid value : interval must be positive")
+            raise ValueError("invalid value : interval must be positive")
         self.__ips = socket.gethostbyname_ex(socket.gethostname())[-1] + [
             "localhost",
             "127.0.0.1",
@@ -78,7 +79,7 @@ class Radio:
         self.config()
 
     def on(self):
-        """Enable the radio"""
+        """Enable the radio."""
         if self.__on:
             return
         self.__on = True
@@ -103,7 +104,7 @@ class Radio:
         Thread(target=self.__acceptClientConnection, daemon=True).start()
 
     def off(self):
-        """Disable the radio"""
+        """Disable the radio."""
         if not self.__on:
             return
         self.__sync_client.unlinkPort(self.__port)
@@ -112,7 +113,7 @@ class Radio:
         self.__receive_server.close()
 
     def config(self, **kwargs):
-        """Configure the radio
+        """Configure the radio.
 
         Parameters:
         -----------
@@ -222,11 +223,11 @@ class Radio:
             self.__sync_client.linkPort(self.__group, self.__port)
 
     def reset(self):
-        """Reset the radio to its default values"""
+        """Reset the radio to its default values."""
         config()
 
     def send_bytes(self, message: bytes):
-        """Send a message in bytes
+        """Send a message in bytes.
 
         Parameters:
         -----------
@@ -258,7 +259,7 @@ class Radio:
         self.__connected_lock.release()
 
     def send(self, message: str):
-        """Send a message
+        """Send a message.
 
         Parameters:
         -----------
@@ -277,9 +278,9 @@ class Radio:
         self.send_bytes(bytes(message, "utf8"))
 
     def receive_bytes(self) -> Union[bytes, None]:
-        """Receive a message in bytes
+        """Receive a message in bytes.
 
-        Returns
+        Returns:
         -------
         message : The message received in bytes or None if no message (Union[bytes, None])
         """
@@ -294,14 +295,14 @@ class Radio:
         return data
 
     def receive_bytes_into(self, buffer):
-        """Doesnt work yet"""
+        """Doesnt work yet."""
         if not self.__on:
             return
 
     def receive(self) -> Union[str, None]:
-        """Receive a message
+        """Receive a message.
 
-        Returns
+        Returns:
         -------
         message : The message received or None if no message (Union[str, None])
 
@@ -313,14 +314,14 @@ class Radio:
             return
         message = self.receive_bytes()
         try:
-            return None if message == None else str(message, "utf8")
+            return None if message is None else str(message, "utf8")
         except:
             raise ValueError("Convertion from bytes to string failed")
 
     def receive_full(self) -> Tuple[Union[bytes, None], int, int]:
-        """Receive a full message
+        """Receive a full message.
 
-        Returns
+        Returns:
         -------
         message : The message received or None if no message (Union[bytes, None])
 
@@ -337,7 +338,7 @@ class Radio:
         )
 
     def __acceptClientConnection(self):
-        """Accept a client connection"""
+        """Accept a client connection."""
         while self.__on:
             try:
                 if self.__debug:
@@ -351,7 +352,7 @@ class Radio:
                     print(f"Radio : __acceptClientConnection - {e}")
 
     def __receiveData(self, connection: Connection):
-        """Receive data from a connection and put it in the data queue
+        """Receive data from a connection and put it in the data queue.
 
         Parameters:
         -----------
@@ -380,7 +381,7 @@ class Radio:
                 connection.close()
 
     def __refresh_connected_clients(self):
-        """Try to connect to the address given by SynchronisationServer"""
+        """Try to connect to the address given by SynchronisationServer."""
         self.__addr_lock.acquire()
         self.__connected_lock.acquire()
         for addr in list(self.__addr):
@@ -398,7 +399,7 @@ class Radio:
         self.__connected_lock.release()
 
     def __synchroniseAddresses(self):
-        """Synchronise with the SynchronisationServer until the connection is lost if the synchronisation doesn't already exists"""
+        """Synchronise with the SynchronisationServer until the connection is lost if the synchronisation doesn't already exists."""
         if self.__debug:
             print("Radio : Try to Synchronise address with the SynchronisationServer")
         while self.__on:

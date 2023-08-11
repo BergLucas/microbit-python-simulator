@@ -1,14 +1,16 @@
 def calibrate() -> None:
     """Starts the calibration process.
 
-    An instructive message will be scrolled to the user after which they will need to rotate the
-    device in order to draw a circle on the LED display.
+    An instructive message will be scrolled to the user after which they
+    will need to rotate the device in order to draw a circle on the LED display.
     """
     ...
 
 
 def is_calibrated() -> bool:
-    """Returns `True` if the compass has been successfully calibrated, and returns `False` otherwise.
+    """Returns `True` if the compass has been successfully calibrated.
+
+    Returns `False` otherwise.
 
     Returns:
         bool: Whether the compass has been calibrated.
@@ -22,8 +24,9 @@ def clear_calibration() -> None:
 
 
 def get_x() -> int:
-    """Gives the reading of the magnetic field strength on the `x` axis in nano tesla,
-    as a positive or negative integer, depending on the direction of the field.
+    """Gives the reading of the magnetic field strength on the `x` axis in nano tesla.
+
+    It is a positive or negative integer, depending on the direction of the field.
 
     Returns:
         int: The reading of the magnetic field strength on the x axis.
@@ -32,8 +35,9 @@ def get_x() -> int:
 
 
 def get_y() -> int:
-    """Gives the reading of the magnetic field strength on the `y` axis in nano tesla,
-    as a positive or negative integer, depending on the direction of the field.
+    """Gives the reading of the magnetic field strength on the `y` axis in nano tesla.
+
+    It is a positive or negative integer, depending on the direction of the field.
 
     Returns:
         int: The reading of the magnetic field strength on the y axis.
@@ -42,8 +46,9 @@ def get_y() -> int:
 
 
 def get_z() -> int:
-    """Gives the reading of the magnetic field strength on the `z` axis in nano tesla,
-    as a positive or negative integer, depending on the direction of the field.
+    """Gives the reading of the magnetic field strength on the `z` axis in nano tesla.
+
+    It is a positive or negative integer, depending on the direction of the field.
 
     Returns:
         int: The reading of the magnetic field strength on the z axis.
@@ -52,8 +57,10 @@ def get_z() -> int:
 
 
 def heading() -> int:
-    """Gives the compass heading, calculated from the above readings, as an integer in the range from 0 to 360,
-    representing the angle in degrees, clockwise, with north as 0.
+    """Gives the compass heading, calculated from the above readings.
+
+    It is an integer in the range from 0 to 360, representing the angle in degrees,
+    clockwise, with north as 0.
 
     Returns:
         int: The compass heading, from 0 to 360.
@@ -62,7 +69,9 @@ def heading() -> int:
 
 
 def get_field_strength() -> int:
-    """Returns an integer indication of the magnitude of the magnetic field around the device in nano tesla.
+    """Returns an indication of the magnitude of the magnetic field around the device.
+
+    It is an integer in nano tesla.
 
     Returns:
         int: The magnitude of the magnetic field around the device in nano tesla.

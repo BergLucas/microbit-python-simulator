@@ -1,11 +1,12 @@
-import socket, struct
+import socket
+from typing import Tuple
+
 from .Connection import Connection
-from typing import Union, Tuple
 
 
 class ConnectionServer:
     def __init__(self, port: int, ip: str = "", timeout: float = None) -> None:
-        """Create a connection server
+        """Create a connection server.
 
         Parameters:
         -----------
@@ -39,16 +40,17 @@ class ConnectionServer:
         return self.__alive
 
     def accept(self) -> Tuple[Connection, Tuple[str, int]]:
-        """Wait for an incoming connection
+        """Wait for an incoming connection.
 
         Returns:
         --------
-        connection_info : A tuple Connection and addr (Tuple[Connection, Tuple[str, int]])"""
+        connection_info : A tuple Connection and addr (Tuple[Connection, Tuple[str, int]])
+        """
         socket, addr = self.__socket.accept()
         return Connection(socket), addr
 
     def close(self):
-        """Close the connection server"""
+        """Close the connection server."""
         self.__alive = False
         self.__socket.shutdown(socket.SHUT_RDWR)
         self.__socket.close()

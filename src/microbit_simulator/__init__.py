@@ -1,20 +1,24 @@
+from threading import Thread
+from tkinter import Canvas, Misc, Tk
+from typing import Literal, Optional
+
+from microbit_protocol.commands import MicrobitCommand
 from microbit_protocol.commands.microbit import (
     MicrobitResetCommand,
     MicrobitTemperatureCommand,
 )
+from microbit_protocol.exceptions import CommunicationClosedError
 from microbit_protocol.peer import MicrobitPeer, MicrobitWebsocketPeer
-from microbit_protocol.exceptions import CommunicationClosed
-from microbit_protocol.commands import MicrobitCommand
+
 from microbit_simulator.accelerometer import MicrobitAccelerometer
+from microbit_simulator.button import BUTTON_A, BUTTON_B, MicrobitButton
 from microbit_simulator.display import MicrobitDisplay
-from microbit_simulator.button import MicrobitButton, BUTTON_A, BUTTON_B
 from microbit_simulator.utils import rgb
-from tkinter import Tk, Misc, Canvas
-from typing import Optional, Literal
-from threading import Thread
 
 
 class MicrobitSimulator(Tk):
+    """A simulator for the micro:bit."""
+
     def __init__(self, width: int = 900, height: int = 500) -> None:
         """Initialises self to a MicrobitSimulator.
 
@@ -45,6 +49,8 @@ class MicrobitSimulator(Tk):
         )
 
     def open(self) -> None:
+        """Open the MicrobitSimulator window."""
+
         def target():
             peer = MicrobitWebsocketPeer.wait_for_connection("localhost", 8765)
             self.peer = peer
@@ -54,13 +60,13 @@ class MicrobitSimulator(Tk):
             self.__accelerometer.peer = peer
             try:
                 peer.listen()
-            except CommunicationClosed:
+            except CommunicationClosedError:
                 self.peer = None
 
         Thread(target=target, daemon=True).start()
 
     def quit(self) -> None:
-        """Quit the MicrobitSimulator window"""
+        """Quit the MicrobitSimulator window."""
         self.__reset()
         super().quit()
 
@@ -194,7 +200,7 @@ class MicrobitSimulator(Tk):
         return display
 
     @staticmethod
-    def __place_button(
+    def __place_button(  # noqa: PLR0913
         master: Misc,
         rwidth: float,
         relx: float,
@@ -278,7 +284,7 @@ class MicrobitSimulator(Tk):
                 self.__peer.send_command(
                     MicrobitTemperatureCommand(temperature=self.__temperature)
                 )
-            except CommunicationClosed:
+            except CommunicationClosedError:
                 self.__peer = None
 
 

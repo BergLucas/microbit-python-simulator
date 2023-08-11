@@ -1,7 +1,7 @@
-from threading import Lock
-from copy import deepcopy
-from typing import Dict, List, Tuple, Union
 import json
+from copy import deepcopy
+from threading import Lock
+from typing import Dict, List, Tuple, Union
 
 Address = Tuple[str, int]
 
@@ -29,7 +29,7 @@ def checkAddress(address: Address):
 
 class AddressesLinker:
     def __init__(self):
-        """A class that link addresses (ip, port) to values. This class is thread-safe"""
+        """A class that link addresses (ip, port) to values. This class is thread-safe."""
         self.__addresses = {}
         self.__addresses_lock = Lock()
 
@@ -216,7 +216,7 @@ class AddressesLinker:
         return True
 
     def toJSON(self) -> bytes:
-        """Serialize the addressesLinker
+        """Serialize the addressesLinker.
 
         Returns:
         --------
@@ -236,7 +236,7 @@ class AddressesLinker:
 
     @staticmethod
     def fromJSON(serialised_adresseslinker: bytes):
-        """Deserialize the addressesLinker
+        """Deserialize the addressesLinker.
 
         Parameters:
         -----------
@@ -268,5 +268,5 @@ class AddressesLinker:
         except Exception as e:
             print(e)
             raise ValueError(
-                f"invalid value : serialised_adresseslinker has an invalid value"
+                "invalid value : serialised_adresseslinker has an invalid value"
             )

@@ -1,12 +1,13 @@
-from time import sleep
-from typing import Union, Tuple
+import socket
+import struct
+from typing import Tuple
+
 from .AddressesLinker import Address, checkAddress
-import socket, struct
 
 
 class Connection:
     def __init__(self, connected_socket: socket.socket) -> None:
-        """Hold the connection of a socket
+        """Hold the connection of a socket.
 
         Parameters:
         -----------
@@ -26,7 +27,7 @@ class Connection:
         return self.__alive
 
     def send(self, packet: bytes) -> None:
-        """Send a packet of data
+        """Send a packet of data.
 
         Parameters:
         -----------
@@ -51,7 +52,7 @@ class Connection:
             raise TypeError(f"invalid type : {type(packet)} is not bytes")
 
     def recv(self) -> bytes:
-        """Receive a packet of data
+        """Receive a packet of data.
 
         Returns:
         --------
@@ -75,7 +76,7 @@ class Connection:
             return b""
 
     def send_msg(self, message: str) -> None:
-        """Send a message
+        """Send a message.
 
         Parameters:
         -----------
@@ -93,7 +94,7 @@ class Connection:
             raise TypeError(f"invalid type : {type(message)} is not str")
 
     def recv_msg(self) -> str:
-        """Receive a message
+        """Receive a message.
 
         Returns:
         --------
@@ -106,14 +107,14 @@ class Connection:
         return str(self.recv(), "utf-8")
 
     def close(self) -> None:
-        """Close the connection"""
+        """Close the connection."""
         if self.__alive:
             self.__alive = False
             self.__socket.shutdown(socket.SHUT_RDWR)
             self.__socket.close()
 
     def __recv_nbytes(self, number: int) -> bytes:
-        """Receive nbytes
+        """Receive nbytes.
 
         Parameters:
         -----------
@@ -139,7 +140,7 @@ class Connection:
 
     @staticmethod
     def try_connection(addr: Tuple[str, int], timeout: float = None):
-        """Try to create a connection to the addr
+        """Try to create a connection to the addr.
 
         Parameters:
         -----------
@@ -172,7 +173,7 @@ class Connection:
 
     @staticmethod
     def create_connection(addr: Tuple[str, int], timeout: float = None):
-        """Try to create a connection to the addr
+        """Try to create a connection to the addr.
 
         Parameters:
         -----------
@@ -203,7 +204,7 @@ class Connection:
 
     @staticmethod
     def isPortOpen(addr: Address, timeout: float = None):
-        """Check if the port at the address is listening
+        """Check if the port at the address is listening.
 
         Parameters:
         -----------

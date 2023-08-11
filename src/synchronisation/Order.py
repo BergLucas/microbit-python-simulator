@@ -3,7 +3,7 @@ import json
 
 class Order:
     def __init__(self):
-        """Create an order"""
+        """Create an order."""
         self.__order = {}
 
     @property
@@ -11,7 +11,7 @@ class Order:
         return self.__order
 
     def link(self, value: str, port: int):
-        """Add an link order
+        """Add an link order.
 
         Parameters:
         -----------
@@ -29,7 +29,7 @@ class Order:
         self.__order = {"link": [value, port]}
 
     def unlink(self, port: int):
-        """Add a unlink order
+        """Add a unlink order.
 
         Parameters:
         -----------
@@ -44,7 +44,7 @@ class Order:
         self.__order = {"unlink": port}
 
     def get(self, value: str):
-        """Add a get order
+        """Add a get order.
 
         Parameters:
         -----------
@@ -59,7 +59,7 @@ class Order:
         self.__order = {"get": value}
 
     def toJSON(self) -> bytes:
-        """Convert the order to JSON format
+        """Convert the order to JSON format.
 
         Returns:
         --------
@@ -69,7 +69,7 @@ class Order:
 
     @staticmethod
     def fromJSON(encoded_order: bytes):
-        """Convert the order in JSON format to an order
+        """Convert the order in JSON format to an order.
 
         Parameters:
         -----------

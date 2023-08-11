@@ -1,22 +1,25 @@
-from microbit_protocol.exceptions import CommunicationClosed
-from microbit_protocol.peer import MicrobitWebsocketPeer
+import logging
+import subprocess
+from _thread import interrupt_main
+from threading import Thread
+
+from microbit_client.accelerometer import Accelerometer
+from microbit_client.button import Button, MicrobitButton
+from microbit_client.display import Display
+from microbit_client.microbit import Microbit
 from microbit_client.pin import (
     MicroBitAnalogDigitalPin,
     MicroBitDigitalPin,
     MicroBitTouchPin,
 )
-from microbit_client.button import Button, MicrobitButton
-from microbit_client.accelerometer import Accelerometer
-from microbit_client.microbit import Microbit
-from microbit_client.display import Display
-from _thread import interrupt_main
-from threading import Thread
-import subprocess
-import logging
+from microbit_protocol.exceptions import CommunicationClosedError
+from microbit_protocol.peer import MicrobitWebsocketPeer
 
 logger = logging.getLogger(__name__)
 
-process = subprocess.Popen(["python", "-m", "microbit_simulator"], shell=True)
+process = subprocess.Popen(
+    ["python", "-m", "microbit_simulator"], shell=True  # noqa: S602, S607
+)
 
 peer = MicrobitWebsocketPeer.connect("localhost", 8765)
 
@@ -50,7 +53,7 @@ pin20: MicroBitDigitalPin = ...
 def target() -> None:
     try:
         peer.listen()
-    except CommunicationClosed:
+    except CommunicationClosedError:
         logger.warning("Connection closed unexpectedly")
     process.kill()
     interrupt_main()

@@ -1,16 +1,14 @@
-"""
-This package is the simulation of the radio module from the microbit
+"""This package is the simulation of the radio module from the microbit.
 
 Some options are available in the Options.py file
 
 Documentation: https://microbit-micropython.readthedocs.io/fr/latest/radio.html
 """
-from .Radio import RATE_250KBIT, RATE_1MBIT, RATE_2MBIT
 from typing import Tuple, Union
 
 
 def __startRadio():
-    """Start a radio
+    """Start a radio.
 
     Returns:
     --------
@@ -20,17 +18,18 @@ def __startRadio():
     -------
     TypeError if a parameter has an invalid type
     """
+    from synchronisation import Connection, SynchronisationServer, checkAddress
+
     from .Radio import Radio
     from .Settings import (
-        SYNCHRONISATION_IP,
-        SYNCHRONISATION_PORT,
         AUTO_START_SYNCHRONISATION_SERVER,
         BLUETOOTH_PORT,
-        INTERVAL,
-        TIMEOUT,
         DEBUG,
+        INTERVAL,
+        SYNCHRONISATION_IP,
+        SYNCHRONISATION_PORT,
+        TIMEOUT,
     )
-    from synchronisation import Connection, checkAddress, SynchronisationServer
 
     # Check types
     if not isinstance(AUTO_START_SYNCHRONISATION_SERVER, bool):
@@ -61,7 +60,7 @@ def __startRadio():
 
 
 def __find_sync_server(port: int, timeout: int = None) -> Union[str, None]:
-    """Find the ip of a synchronisation server
+    """Find the ip of a synchronisation server.
 
     Parameters:
     -----------
@@ -84,9 +83,10 @@ def __find_sync_server(port: int, timeout: int = None) -> Union[str, None]:
         raise TypeError(f"invalid type : {type(timeout)} is not int")
     # Init
     import socket
-    from synchronisation import Connection
-    from threading import Thread, Lock
     from queue import Queue
+    from threading import Lock, Thread
+
+    from synchronisation import Connection
 
     ips_queue = Queue()
     ips_lock = Lock()
@@ -99,6 +99,7 @@ def __find_sync_server(port: int, timeout: int = None) -> Union[str, None]:
         if len(ip_parts) > 3:
             for i in range(256):
                 ips_queue.put(f"{ip_parts[0]}.{ip_parts[1]}.{ip_parts[2]}.{i}")
+
     # Create the ping function
     def ping():
         continue_ping = True
@@ -195,7 +196,8 @@ def receive_bytes() -> bytes:
 def receive_bytes_into(buffer):
     """DOESNT WORK YET - Receive the next incoming message on the message queue.
     Copies the message into buffer, trimming the end of the message if necessary.
-    Returns None if there are no pending messages, otherwise it returns the length of the message (which might be more than the length of the buffer)."""
+    Returns None if there are no pending messages, otherwise it returns the length of the message (which might be more than the length of the buffer).
+    """
     return __radio.receive_bytes_into(buffer)
 
 

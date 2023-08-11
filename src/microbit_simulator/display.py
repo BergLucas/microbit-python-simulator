@@ -1,16 +1,26 @@
+from tkinter import Canvas, Frame, Misc
+from typing import Optional
+
+from microbit_protocol.commands import MicrobitCommand
 from microbit_protocol.commands.microbit.display import (
-    MicrobitDisplayReadLightLevelCommand,
-    MicrobitDisplayOnCommand,
+    DISPLAY_MAX_X,
+    DISPLAY_MAX_Y,
+    DISPLAY_MIN_X,
+    DISPLAY_MIN_Y,
+    LED_MAX_VALUE,
+    LED_MIN_VALUE,
+    MAX_LIGHT_LEVEL,
+    MIN_LIGHT_LEVEL,
     MicrobitDisplayOffCommand,
+    MicrobitDisplayOnCommand,
+    MicrobitDisplayReadLightLevelCommand,
     MicrobitDisplaySetPixelCommand,
     MicrobitDisplayShowCommand,
 )
-from microbit_protocol.exceptions import CommunicationClosed
-from microbit_protocol.commands import MicrobitCommand
+from microbit_protocol.exceptions import CommunicationClosedError
 from microbit_protocol.peer import MicrobitPeer
+
 from microbit_simulator.utils import rgb
-from tkinter import Frame, Canvas, Misc
-from typing import Optional
 
 
 class MicrobitLed(Frame):
@@ -44,7 +54,7 @@ class MicrobitLed(Frame):
         Args:
             brightness (int): The brightness of the led. Must be between 0 and 9.
         """
-        assert 0 <= brightness and brightness <= 9
+        assert LED_MIN_VALUE <= brightness and brightness <= LED_MAX_VALUE
 
         self.__light.config(
             bg=rgb(
@@ -89,13 +99,15 @@ class MicrobitLed(Frame):
         Args:
             value (int): The brightness of the led. Must be between 0 and 9.
         """
-        assert 0 <= value and value <= 9
+        assert LED_MIN_VALUE <= value and value <= LED_MAX_VALUE
 
         self.__brightness = value
         self.__config_light(value)
 
 
 class MicrobitDisplay(Frame):
+    """A display widget that represents the display of a microbit."""
+
     def __init__(self, master: Misc, size: int):
         """Initialises self to a DisplayWidget.
 
@@ -181,7 +193,7 @@ class MicrobitDisplay(Frame):
         Args:
             value (int): The light level of the display. Must be between 0 and 255.
         """
-        assert 0 <= value and value <= 255
+        assert MIN_LIGHT_LEVEL <= value and value <= MAX_LIGHT_LEVEL
 
         self.__light_level = value
         self.__sync_light_level()
@@ -194,7 +206,7 @@ class MicrobitDisplay(Frame):
         """
         return self.__light_level
 
-    def __place_led(
+    def __place_led(  # noqa: PLR0913
         self,
         led_rwidth: float,
         led_rheight: float,
@@ -205,8 +217,8 @@ class MicrobitDisplay(Frame):
         """Place a led on the display.
 
         Args:
-            led_width (float): The relative width of the led. Must be positive.
-            led_height (float): The relative height of the led. Must be positive.
+            led_rwidth (float): The relative width of the led. Must be positive.
+            led_rheight (float): The relative height of the led. Must be positive.
             relx (float): The x position of the led. Must be positive.
             rely (float): The y position of the led. Must be positive.
             size (float): The size of the display. Must be positive.
@@ -247,16 +259,18 @@ class MicrobitDisplay(Frame):
             self.__show(command.image)
 
     def __set_pixel(self, x: int, y: int, value: int) -> None:
-        """Set the brightness of the LED at column x and row y to value, which has to be between 0 (off) and 9 (bright).
+        """Set the brightness of the LED at column x and row y to value.
+
+        The brightness has to be between 0 (off) and 9 (bright).
 
         Args:
             x (int): The x position of the led. Must be between 0 and 4.
             y (int): The y position of the led. Must be between 0 and 4.
             value (int): The brightness of the led. Must be between 0 and 9.
         """
-        assert 0 <= x and x <= 4
-        assert 0 <= y and y <= 4
-        assert 0 <= value and value <= 9
+        assert DISPLAY_MIN_X <= x and x <= DISPLAY_MAX_X
+        assert DISPLAY_MIN_Y <= y and y <= DISPLAY_MAX_Y
+        assert LED_MIN_VALUE <= value and value <= LED_MAX_VALUE
 
         self.__leds[x][y].brightness = value
 
@@ -264,7 +278,8 @@ class MicrobitDisplay(Frame):
         """Display the image.
 
         Args:
-            image (list[list[int]]): The image to display. Must be a maximum 5x5 matrix of integers between 0 and 9.
+            image (list[list[int]]): The image to display.
+                Must be a maximum 5x5 matrix of integers between 0 and 9.
         """
         for y, row in enumerate(image):
             for x, value in enumerate(row):
@@ -291,5 +306,5 @@ class MicrobitDisplay(Frame):
                 self.__peer.send_command(
                     MicrobitDisplayReadLightLevelCommand(light_level=self.__light_level)
                 )
-            except CommunicationClosed:
+            except CommunicationClosedError:
                 self.__peer = None
