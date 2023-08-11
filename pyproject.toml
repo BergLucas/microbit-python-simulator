@@ -2,8 +2,10 @@
 name = "microbit-python-simulator"
 version = "0.1.0"
 description = "A microbit simulator built with Python"
-authors = ["Lucas Berg <55436804+BergLucas@users.noreply.github.com>"]
+authors = ["Lucas Berg <55436804+berglucas@users.noreply.github.com>"]
 readme = "README.md"
+keywords = ["Microbit", "Poetry", "Simulator"]
+classifiers = ["Programming Language :: Python :: 3.11"]
 packages = [
     {include = "microbit", from = "src"},
     {include = "microbit_client", from = "src"},
@@ -19,6 +21,53 @@ websockets = "^11.0.3"
 pydantic = "^2.0.3"
 typing-extensions = "^4.7.1"
 
+[tool.poetry.group.dev.dependencies]
+black = "^23.7.0"
+mypy = "^1.5.0"
+coverage = "^7.2.7"
+ruff = "^0.0.284"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+
+[tool.poe.tasks]
+coverage = "coverage run -m unittest -v"
+coverage-report = [
+    "coverage",
+    { cmd = "coverage report" }
+]
+coverage-html = [
+    "coverage",
+    { cmd = "coverage html" }
+]
+mypy = "mypy src"
+black = "black src"
+ruff = "ruff check --fix src"
+lint = ["black", "ruff", "mypy"]
+
+
+[tool.ruff]
+select = [
+    "D",   # pydocstyle
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "N",   # pep8-naming
+    "I",   # isort
+    "C",   # flake8-comprehensions
+    "B",   # flake8-bugbear
+    "S",   # flake8-bandit
+    "TCH", # flake8-type-checking
+    "Q",   # flake8-quotes
+    "PL",  # pylint
+]
+
+ignore = [
+    "D100",
+    "D104",
+]
+
+[tool.ruff.pydocstyle]
+convention = "google"
