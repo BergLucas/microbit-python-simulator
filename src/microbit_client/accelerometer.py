@@ -116,11 +116,11 @@ class Accelerometer:
         """
         return name in self.__gestures
 
-    def get_gestures(self) -> tuple[Gesture]:
+    def get_gestures(self) -> tuple[Gesture, ...]:
         """Gets the list of gestures that have just been performed.
 
         Returns:
-            tuple[Gesture]: The list of gestures that have just been performed.
+            tuple[Gesture, ...]: The list of gestures that have just been performed.
         """
         gestures = tuple(self.__gestures)
         self.__gestures.clear()

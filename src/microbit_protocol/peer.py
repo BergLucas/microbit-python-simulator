@@ -194,7 +194,9 @@ class MicrobitIoPeer(MicrobitPeer):
                 raise CommunicationClosedError() from e
 
             try:
-                command = MicrobitCommandAdapter.validate_json(response)
+                command: MicrobitCommand = MicrobitCommandAdapter.validate_json(
+                    response
+                )  # type: ignore
             except ValidationError:
                 logger.warning(f"Received invalid command: {response}")
                 continue
@@ -330,9 +332,11 @@ class MicrobitWebsocketPeer(MicrobitPeer):
                 break
 
             try:
-                command = MicrobitCommandAdapter.validate_json(response)
+                command: MicrobitCommand = MicrobitCommandAdapter.validate_json(
+                    response
+                )  # type: ignore
             except ValidationError:
-                logger.warning(f"Received invalid command: {response}")
+                logger.warning(f"Received invalid command: {response!r}")
                 continue
 
             for listener in self.__listeners:

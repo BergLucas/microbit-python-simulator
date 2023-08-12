@@ -63,7 +63,7 @@ def init(  # noqa: PLR0913
     ...
 
 
-def read(nbytes: int) -> bytes:
+def read(nbytes: int) -> bytes:  # type: ignore
     """Read at most `nbytes`. Returns what was read.
 
     Args:

@@ -122,7 +122,7 @@ def scale(
 
 
 @overload
-def scale(
+def scale(  # type: ignore
     value: Union[int, float],
     from_: tuple[Union[int, float], Union[int, float]],
     to: tuple[int, int],
@@ -140,7 +140,7 @@ def scale(
     """
 
 
-def scale(
+def scale(  # type: ignore
     value: Union[int, float],
     from_: tuple[Union[int, float], Union[int, float]],
     to: tuple[Union[int, float], Union[int, float]],

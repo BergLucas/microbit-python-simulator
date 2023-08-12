@@ -4,9 +4,9 @@ from typing import Literal, Protocol
 class MicroBitDigitalPin(Protocol):
     """A digital pin on the micro:bit."""
 
-    PULL_UP = 3
-    PULL_DOWN = 1
-    NO_PULL = 0
+    PULL_UP: Literal[3] = 3
+    PULL_DOWN: Literal[1] = 1
+    NO_PULL: Literal[0] = 0
 
     def read_digital(self) -> Literal[0, 1]:
         """Return 1 if the pin is high, and 0 if it's low.

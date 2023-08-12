@@ -103,13 +103,13 @@ def was_gesture(name: Gesture) -> bool:
     return _accelerometer.was_gesture(name)
 
 
-def get_gestures() -> tuple[Gesture]:
+def get_gestures() -> tuple[Gesture, ...]:
     """Get a historical list of the registered gestures.
 
     Calling this function clears the gesture history before returning.
 
     Returns:
-        A tuple of the gesture history, most recent is listed last.
+        tuple[Gesture, ...]: A tuple of the gesture history, most recent is listed last.
     """
     return _accelerometer.get_gestures()
 

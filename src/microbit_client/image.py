@@ -785,167 +785,167 @@ class Image:
     }
 
     # Built-In Images
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def HEART(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("09090:99999:99999:09990:00900")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def HEART_SMALL(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00000:09090:09990:00900:00000")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def HAPPY(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00000:09090:00000:90009:09990")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def SMILE(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00000:00000:00000:90009:09990")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def SAD(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00000:09090:00000:09990:90009")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def CONFUSED(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00000:09090:00000:09090:90909")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def ANGRY(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("90009:09090:00000:99999:90909")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def ASLEEP(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00000:99099:00000:09990:00000")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def SURPRISED(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("09090:00000:00900:09090:00900")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def SILLY(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("90009:00000:99999:00099:00099")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def FABULOUS(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("99999:99099:00000:09090:09990")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def MEH(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("99099:00000:00090:00900:09000")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def YES(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00000:00009:00090:90900:09000")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def NO(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("90009:09090:00900:09090:90009")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def CLOCK12(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00900:00900:00900:00000:00000")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def CLOCK11(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("09000:09900:00900:00000:00000")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def CLOCK10(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00000:99000:09900:00000:00000")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def CLOCK9(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00000:00000:99900:00000:00000")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def CLOCK8(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00000:00000:09900:99000:00000")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def CLOCK7(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00000:00000:00900:09900:09000")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def CLOCK6(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00000:00000:00900:00900:00900")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def CLOCK5(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00000:00000:00900:00990:00090")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def CLOCK4(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00000:00000:00990:00099:00000")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def CLOCK3(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00000:00000:00999:00000:00000")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def CLOCK2(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00000:00099:00990:00000:00000")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def CLOCK1(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00090:00990:00900:00000:00000")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def ALL_CLOCKS(cls) -> tuple[Image, ...]:  # noqa: N802, D102
-        return (
+        return (  # type: ignore
             cls.CLOCK1,
             cls.CLOCK2,
             cls.CLOCK3,
@@ -960,59 +960,59 @@ class Image:
             cls.CLOCK12,
         )
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def ARROW_N(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00900:09990:90909:00900:00900")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def ARROW_NE(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00999:00099:00909:09000:90000")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def ARROW_E(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00900:00090:99999:00090:00900")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def ARROW_SE(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("90000:09000:00909:00099:00999")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def ARROW_S(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00900:00900:90909:09990:00900")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def ARROW_SW(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00009:00090:90900:99000:99900")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def ARROW_W(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00900:09000:99999:09000:00900")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def ARROW_NW(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("99900:99000:90900:00090:00009")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def ALL_ARROWS(cls) -> tuple[Image, ...]:  # noqa: N802, D102
-        return (
+        return (  # type: ignore
             cls.ARROW_N,
             cls.ARROW_NE,
             cls.ARROW_E,
@@ -1023,175 +1023,175 @@ class Image:
             cls.ARROW_NW,
         )
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def TRIANGLE(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("99999:00900:09090:99999:00000")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def TRIANGLE_LEFT(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("90000:99000:90900:90090:99999")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def CHESSBOARD(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("09090:90909:09090:90909:09090")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def DIAMOND(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00900:09090:90009:09090:00900")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def DIAMOND_SMALL(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00000:00900:09090:00900:00000")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def SQUARE(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("99999:90009:90009:90009:99999")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def SQUARE_SMALL(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00000:09990:09090:09990:00000")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def RABBIT(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("90900:90900:99990:99090:99990")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def COW(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("90009:90009:99999:09990:00900")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def MUSIC_CROTCHET(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00900:00900:00900:99900:99900")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def MUSIC_QUAVER(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00900:00990:00909:99900:99900")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def MUSIC_QUAVERS(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("09999:09009:09009:99099:99099")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def PITCHFORK(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("90909:90909:99999:00900:00900")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def XMAS(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00900:09990:00900:09990:99999")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def PACMAN(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("09999:99090:99900:99990:09999")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def TARGET(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00900:09990:99099:09990:00900")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def TSHIRT(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("99099:99999:09990:09990:09990")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def ROLLERSKATE(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00099:00099:99999:99999:09090")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def DUCK(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("09900:99900:09999:09990:00000")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def HOUSE(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00900:09990:99999:09990:09090")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def TORTOISE(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00000:09990:99999:09090:00000")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def BUTTERFLY(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("99099:99999:00900:99999:99099")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def STICKFIGURE(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00900:99999:00900:09090:90009")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def GHOST(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("09990:90909:99999:99999:90909")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def SWORD(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("00900:00900:00900:09990:00900")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def GIRAFFE(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("99000:09000:09000:09990:09090")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def SKULL(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("09990:90909:99999:09990:09990")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def UMBRELLA(cls) -> Image:  # noqa: N802, D102
         return cls.__constant_image("09990:99999:00900:90900:99900")
 
-    @classmethod
+    @classmethod  # type: ignore
     @property
     @cache
     def SNAKE(cls) -> Image:  # noqa: N802, D102

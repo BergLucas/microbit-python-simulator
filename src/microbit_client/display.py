@@ -152,6 +152,7 @@ class Display:
         if isinstance(image, (int, float)):
             image = str(image)
 
+        images: Iterable[Image]
         if isinstance(image, str):
             images = [Image(letter) for letter in image]
         else:

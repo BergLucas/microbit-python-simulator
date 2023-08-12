@@ -24,7 +24,7 @@ def init(
     ...
 
 
-def scan() -> list[int]:
+def scan() -> list[int]:  # type: ignore
     """Scan the bus for devices.
 
     Returns:
@@ -34,7 +34,7 @@ def scan() -> list[int]:
     ...
 
 
-def read(addr: int, n: int, repeat: bool = False) -> bytes:
+def read(addr: int, n: int, repeat: bool = False) -> bytes:  # type: ignore
     """Read `n` bytes from the device with 7-bit address `addr`.
 
     If `repeat` is `True`, no stop bit will be sent.

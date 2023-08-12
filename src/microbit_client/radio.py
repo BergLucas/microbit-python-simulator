@@ -209,7 +209,7 @@ class Radio:
             Optional[int]: The number of bytes received or None if no message.
         """
         if self.__peer is None:
-            return
+            return None
 
         message = self.receive_bytes()
 
@@ -270,6 +270,6 @@ class Radio:
             return None
 
         try:
-            self.__queue.get_nowait()
+            return self.__queue.get_nowait()
         except Empty:
             return None

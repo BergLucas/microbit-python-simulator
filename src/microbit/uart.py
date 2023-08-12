@@ -70,7 +70,7 @@ def init(  # noqa: PLR0913
     ...
 
 
-def any() -> bool:
+def any() -> bool:  # type: ignore
     """Return `True` if any data is waiting, else `False`."""
     ...
 
