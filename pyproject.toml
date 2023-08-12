@@ -10,9 +10,9 @@ packages = [
     {include = "microbit", from = "src"},
     {include = "microbit_client", from = "src"},
     {include = "microbit_protocol", from = "src"},
+    {include = "microbit_server", from = "src"},
     {include = "microbit_simulator", from = "src"},
     {include = "radio", from = "src"},
-    {include = "synchronisation", from = "src"}
 ]
 
 [tool.poetry.dependencies]
