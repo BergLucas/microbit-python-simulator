@@ -11,6 +11,7 @@ from microbit_protocol.commands.microbit.display import (
     LED_MIN_VALUE,
     MAX_LIGHT_LEVEL,
     MIN_LIGHT_LEVEL,
+    MicrobitDisplayClearCommand,
     MicrobitDisplayOffCommand,
     MicrobitDisplayOnCommand,
     MicrobitDisplayReadLightLevelCommand,
@@ -257,6 +258,8 @@ class MicrobitDisplay(Frame):
             self.__set_pixel(command.x, command.y, command.value)
         if isinstance(command, MicrobitDisplayShowCommand):
             self.__show(command.image)
+        if isinstance(command, MicrobitDisplayClearCommand):
+            self.__clear()
 
     def __set_pixel(self, x: int, y: int, value: int) -> None:
         """Set the brightness of the LED at column x and row y to value.
@@ -298,6 +301,12 @@ class MicrobitDisplay(Frame):
         for row in self.__leds:
             for led in row:
                 led.off()
+
+    def __clear(self) -> None:
+        """Clear the display."""
+        for row in self.__leds:
+            for led in row:
+                led.brightness = 0
 
     def __sync_light_level(self) -> None:
         """Sync the display's light_level value."""
