@@ -214,10 +214,10 @@ class Display:
         if isinstance(text, (int, float)):
             text = str(text)
 
-        image = Image(4 + 5 * len(text), 5)
-
-        for i, char in enumerate(text):
-            image.blit(Image(char), 0, 0, 5, 5, 4 + 5 * i, 0)
+        if monospace:
+            image = self.__get_scroll_image_monospace(text)
+        else:
+            image = self.__get_scroll_image(text)
 
         def target() -> None:
             self.__scroll_image(image, delay)
@@ -291,3 +291,89 @@ class Display:
                 ]
             )
         )
+
+    @classmethod
+    def __get_scroll_image_monospace(cls, text: str) -> Image:
+        """Gets an image of the text in monospace to scroll.
+
+        Args:
+            text (str): The text to scroll.
+
+        Returns:
+            Image: The image of the text.
+        """
+        scroll_image = Image(4 + 5 * len(text), 5)
+
+        for i, char in enumerate(text):
+            scroll_image.blit(Image(char), 0, 0, 5, 5, 4 + 5 * i, 0)
+
+        return scroll_image
+
+    @classmethod
+    def __get_scroll_image(cls, text: str) -> Image:
+        """Gets an image of the text to scroll.
+
+        Args:
+            text (str): The text to scroll.
+
+        Returns:
+            Image: The image of the text.
+        """
+        images: list[Image] = []
+        images_width = 0
+
+        for char in text:
+            if char == " ":
+                image = Image(3, 5)
+            else:
+                image = cls.__remove_image_void(Image(char))
+
+            images.append(image)
+            images_width += image.width()
+
+        scroll_image = Image(4 + images_width + len(images) - 1, 5)
+
+        current_width = 4
+        for image in images:
+            scroll_image.blit(image, 0, 0, image.width(), 5, current_width, 0)
+            current_width += image.width() + 1
+
+        return scroll_image
+
+    @classmethod
+    def __remove_image_void(cls, image: Image) -> Image:
+        """Removes the void pixels from an image.
+
+        Args:
+            image (Image): The image to remove the void pixels from.
+
+        Returns:
+            Image: The image without the void pixels.
+        """
+        start = 0
+        while start < image.width() and cls.__is_column_void(image, start):
+            start += 1
+
+        end = image.width() - 1
+        while start < end and cls.__is_column_void(image, end):
+            end -= 1
+
+        width = end - start + 1
+
+        return image.crop(start, 0, width, image.height())
+
+    @classmethod
+    def __is_column_void(cls, image: Image, column: int) -> bool:
+        """Returns whether a column is void.
+
+        Args:
+            image (Image): The image to check.
+            column (int): The column to check.
+
+        Returns:
+            bool: Whether the column is void.
+        """
+        for y in range(image.height()):
+            if image.get_pixel(column, y) != 0:
+                return False
+        return True
