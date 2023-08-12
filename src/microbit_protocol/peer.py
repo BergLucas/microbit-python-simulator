@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import atexit
 import logging
 import socket
 import sys
@@ -299,10 +300,13 @@ class MicrobitWebsocketPeer(MicrobitPeer):
 
                 yield MicrobitWebsocketPeer(connection)
 
+        atexit.register(server_socket.close)
+
         try:
             yield server()
         finally:
             server_socket.close()
+            atexit.unregister(server_socket.close)
 
     def __init__(self, websocket: Connection) -> None:
         """Initializes `self` a new MicrobitWebsocketPeer.
