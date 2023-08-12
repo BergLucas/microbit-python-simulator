@@ -255,7 +255,7 @@ class Radio:
             raise ValueError("message does not start with \\x01\\x00\\x01")
 
         try:
-            return str(message, "utf8")
+            return str(message[len(MESSAGE_PREFIX):], "utf8")
         except ValueError as e:
             raise ValueError("Conversion from bytes to string failed") from e
 
