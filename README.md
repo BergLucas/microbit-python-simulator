@@ -48,7 +48,7 @@ pip install git+https://github.com/BergLucas/microbit-python-simulator
 
 ## Example
 
-This example allows you to display `"Hello World!"` on the microbit:
+This example allows you to display `"Hello, World!"` on the microbit:
 
 ```python
 import microbit
