@@ -11,9 +11,6 @@ files = [
     {file = "annotated_types-0.5.0.tar.gz", hash = "sha256:47cdc3490d9ac1506ce92c7aaa76c579dc3509ff11e098fc867e5130ab7be802"},
 ]
 
-[package.dependencies]
-typing-extensions = {version = ">=4.0.0", markers = "python_version < \"3.9\""}
-
 [[package]]
 name = "black"
 version = "23.7.0"
@@ -507,5 +504,5 @@ files = [
 
 [metadata]
 lock-version = "2.0"
-python-versions = "^3.8"
-content-hash = "6ed53c85a215ae1a26ec5ec2c058c5d6e612f26c72e43749d267190aba17ac32"
+python-versions = "^3.9"
+content-hash = "657f2e9949e8b2e31d4e9675c3fce65f2fd9471b47f461c0b77788335af7d2e0"
