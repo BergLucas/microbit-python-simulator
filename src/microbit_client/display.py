@@ -163,13 +163,13 @@ class Display:
             while loop:
                 self.__send_images(images, delay)
 
+            if clear:
+                self.clear()
+
         if wait:
             target()
         else:
             Thread(target=target, daemon=True).start()
-
-        if clear:
-            self.clear()
 
     def scroll(  # noqa: PLR0913
         self,
