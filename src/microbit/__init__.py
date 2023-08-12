@@ -1,5 +1,3 @@
-import time  # noqa: F401
-import time as utime  # noqa: F401
 from typing import Union, overload
 
 from microbit_client.image import Image  # noqa: F401
