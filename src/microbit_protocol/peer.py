@@ -3,9 +3,19 @@ from __future__ import annotations
 import logging
 import socket
 import sys
+from contextlib import contextmanager
 from enum import Enum, auto
 from threading import Thread, main_thread
-from typing import TYPE_CHECKING, Callable, Optional, Protocol, TextIO, Type
+from typing import (
+    TYPE_CHECKING,
+    Callable,
+    Generator,
+    Iterator,
+    Optional,
+    Protocol,
+    TextIO,
+    Type,
+)
 
 from pydantic import ValidationError
 from typing_extensions import override
@@ -250,27 +260,49 @@ class MicrobitWebsocketPeer(MicrobitPeer):
         Returns:
             MicrobitWebsocketPeer: The peer.
         """
+        with cls.accept_connections(host, port) as server:
+            return next(server)
+
+    @classmethod
+    @contextmanager
+    def accept_connections(
+        cls, host: str, port: int
+    ) -> Generator[Iterator[MicrobitWebsocketPeer], None, None]:
+        """Accepts connections from peers using a websocket.
+
+        Args:
+            host (str): The host.
+            port (int): The port.
+
+        Yields:
+            Generator[Iterator[MicrobitWebsocketPeer], None, None]: A context manager
+                that yields a MicrobitWebsocketPeer server.
+        """
         extensions = enable_server_permessage_deflate(None)
 
         server_socket = socket.create_server((host, port))
         server_socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, True)
 
-        while True:
-            peer_socket, _ = server_socket.accept()
+        def server() -> Iterator[MicrobitWebsocketPeer]:
+            while True:
+                peer_socket, _ = server_socket.accept()
 
-            protocol = ServerProtocol(extensions=extensions)
+                protocol = ServerProtocol(extensions=extensions)
 
-            connection = ServerConnection(peer_socket, protocol)
+                connection = ServerConnection(peer_socket, protocol)
 
-            try:
-                connection.handshake()
-            except Exception:
-                peer_socket.close()
-                continue
+                try:
+                    connection.handshake()
+                except Exception:
+                    peer_socket.close()
+                    continue
 
+                yield MicrobitWebsocketPeer(connection)
+
+        try:
+            yield server()
+        finally:
             server_socket.close()
-
-            return MicrobitWebsocketPeer(connection)
 
     def __init__(self, websocket: Connection) -> None:
         """Initializes `self` a new MicrobitWebsocketPeer.
